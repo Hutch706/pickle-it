@@ -21,12 +21,15 @@ Kept by the director. Each task: status, agent, output. Newest phase at the bott
 - [x] Settings: three layout mockups, docs/design/settings-option-a/b/c.html (ux-designer)
 - [x] Specs updated for Settings tabs, due text, delete-all, migration (product-spec-writer, data-architect)
 - [x] Starter library drafts, docs/content/ (maintenance-content-curator)
-- [ ] Owner decides docs/open-questions.md (Settings layout first)
-- [ ] Verify every source link in docs/content/ (curator built them without opening them)
-- [ ] Contrast check of the other 6 palettes and new tokens (qa-accessibility-tester)
-- [ ] Privacy check of the read-only copy and delete-all scope (privacy-security-reviewer)
-- [ ] Design system, Pantry home, jar screens, onboarding, empty states (ux-designer)
-- [ ] Old app's final notice banner copy (release-manager)
+- [x] Settings layout decided: Option C
+- [x] Verify every source link in docs/content/ (maintenance-content-curator)
+- [x] Contrast check of all 7 palettes, docs/reviews/contrast-2026-11-03.md (qa-accessibility-tester)
+- [x] Privacy check of the read-only copy and delete-all scope (privacy-security-reviewer)
+- [x] Design system start, Pantry home, jar screens, onboarding (ux-designer)
+- [ ] Owner decides docs/open-questions.md
+- [ ] Fold decisions into specs: v1-scope 4.2a due text (product-spec-writer); data-model 4.2/6 privacy fixes, meter reset (data-architect); apply decisions to starter lists (maintenance-content-curator)
+- [ ] Old app's final notice from the privacy review's 8-point list; settle the launch path (release-manager)
+- [ ] Owner signs off specs + mockups, then Phase 3 starts with the Pantry
 
 ## Phase 3: Build, test, release
 Follows "How work flows" in CLAUDE.md, one screen at a time.
