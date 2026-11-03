@@ -27,7 +27,7 @@ Kept by the director. Each task: status, agent, output. Newest phase at the bott
 - [x] Privacy check of the read-only copy and delete-all scope (privacy-security-reviewer)
 - [x] Design system start, Pantry home, jar screens, onboarding (ux-designer)
 - [x] Owner decided docs/open-questions.md (generator oil still open; old app has no users, so no copy or notice)
-- [ ] Fold decisions in: v1-scope (product-spec-writer); data-model, drop the old-app copy, delete-all scope, meter reset (data-architect); starter lists (maintenance-content-curator); mockups and color tokens (ux-designer); release docs and launch path (release-manager)
+- [x] Fold decisions into specs, starter lists, mockups and release docs (all agents; 2026-11-03)
 - [ ] Owner signs off specs + mockups, then Phase 3 starts with the Pantry
 
 ## Phase 3: Build, test, release
