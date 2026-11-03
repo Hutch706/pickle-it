@@ -1,6 +1,27 @@
 # Decision log
 Newest first. Each entry: date, decision, why. Only the owner makes decisions.
 
+## 2026-11-03 (Phase 2 open questions)
+- **The Vehicle Maintenance App has no users with data to move.** So: no read-only copy from the old app, no migration notice period, no old-app banner. CSV import of old-app files stays (it already works). Why: the owner confirmed nobody but them has data in it.
+- **Delete all data deletes only Pickle It's data** (the `pickle-it` database and `pickle-it:` keys). No option to delete the old app's data. Why: no old-app users to clean up after.
+- **Keep tests/contrast-check.mjs.** Plain Node, no runner, no package.json.
+- **Quick-accept batch accepted as recommended** (the full list as it stood in docs/open-questions.md on this date):
+  - Due text with no estimate: "63 hr", "5.5 hr over", "Due now", "Add a reading" (also for miles).
+  - Estimate only when the latest reading is under 90 days old and two readings are 30+ days apart.
+  - Tap a row for Done / Skip / Add reading in place (not swipe), with an 8-second Undo.
+  - More than 50 in a box: "Showing 50 of 57" with links to each jar holding the rest.
+  - Box hints "Overdue and the next 7 days", "In 1 to 4 weeks", "4 weeks or more"; empty header "Nothing needs attention this week".
+  - Inside a jar: due boxes first, then the jar's things; a thing opens its own screen. A jar can link into Settings > Assets.
+  - Bottom bar built as navigation, not tabs, and hidden on Settings.
+  - "hr" for every hour amount. Year shown on estimated dates more than ~6 months out.
+  - Rotating empty-state lines from docs/design/system.md, pun included.
+  - Settings: Assets tab opens first, then remembers the last tab. Jar show/hide switches in App settings; jars not picked in onboarding start hidden.
+  - Delete all data: type DELETE (any case) to confirm; also resets theme and palette; deletes the whole Pickle It database in one step.
+  - Seasonal tasks on fixed calendar dates. Appliances can be their own thing; starter tasks sit on the home by default. Finance things are households or named accounts, default "Household". Warn in v1 when Health/Finance text looks like an account or card number.
+  - Colors: add `--err-ink` and a per-palette `--line-strong`; backup dot uses `--err` with screen-reader text; darken light-mode `--ok` slightly in every palette.
+  - Starter lists: unsourced intervals stay as marked, editable defaults. Engine air filter 30,000 mi or 1 year; battery check yearly in fall; CO alarm uses the printed date, 7 years as fallback; keep all 12 vehicle tasks with the monthly tire check paused; estimated taxes as four yearly tasks with a note that the IRS may shift dates.
+- **Still open:** generator oil interval (see docs/open-questions.md).
+
 ## 2026-11-03 (Phase 2)
 - **Settings layout is Option C** (docs/design/settings-option-c.html): two tabs, Assets first, with search (matches task names too) and jar filter chips; App settings is the second tab. Why: fewest taps to a task, fits at 320 px, handles long asset lists.
 
