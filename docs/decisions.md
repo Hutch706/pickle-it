@@ -1,6 +1,9 @@
 # Decision log
 Newest first. Each entry: date, decision, why. Only the owner makes decisions.
 
+## 2026-11-03 (Phase 2)
+- **Settings layout is Option C** (docs/design/settings-option-c.html): two tabs, Assets first, with search (matches task names too) and jar filter chips; App settings is the second tab. Why: fewest taps to a task, fits at 320 px, handles long asset lists.
+
 ## 2026-11-03 (Phase 1 decisions)
 - **Health tracks reminders only in v1:** recurring appointments and renewals per person, no medical fields.
 - **Finance tracks money deadlines only in v1:** no amounts. Optional amounts may follow later after a privacy review.

@@ -2,7 +2,6 @@
 Each needs an owner decision. Once decided, move it to docs/decisions.md.
 
 ## Settings page (mockups: docs/design/settings-option-a/b/c.html, comparison: docs/design/settings-options.md)
-- **Layout.** A) one Assets tab grouped by jar; B) a tab per category (App, Vehicles, Home, Health, Finance); C) two tabs, Assets first, with search and jar filter chips. Recommended: C. B's five tabs don't fit at 390 px.
 - **First tab shown.** Recommended: Assets, then remember the last tab used.
 - **Where jar show/hide lives.** Recommended: switches under "Jars on the tab bar" in App settings.
 - **Delete all data.** Second confirmation: type DELETE (any case) (recommended), a second dialog, or press-and-hold. Also resets theme and palette: recommended yes, said in step 1.
