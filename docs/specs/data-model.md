@@ -1,6 +1,6 @@
 # Pickle It: data model, due dates, storage and migration
 
-Status: **draft proposal** from data-architect, revised 2026-11-03 (second pass) to match docs/decisions.md "2026-11-03 (Phase 1 decisions)", and again for "2026-11-03 (Phase 2 open questions)". Decided by the owner and marked **(decided)** here: storage approach, storage names, v1 jars, recurrence measures, CSV versioning, box boundaries, rolling week, season dates, several homes/people, hiding jars, units, which measures may combine, estimated dates for miles and hours, what Health and Finance hold, hosting on the shared github.io origin, no data copy from the old app, the scope of Delete all data, the 90-day estimate rule, seasonal tasks on fixed calendar dates, appliances, the Finance default thing and the account-number warning. Everything else is proposed; open items are in "Decisions needed" at the end.
+Status: **draft proposal** from data-architect, revised 2026-11-03 (second pass) to match docs/decisions.md "2026-11-03 (Phase 1 decisions)", and again for "2026-11-03 (Phase 2 open questions)". Decided by the owner and marked **(decided)** here: storage approach, storage names, v1 jars, recurrence measures, CSV versioning, box boundaries, rolling week, season dates, several homes/people, hiding jars, units, which measures may combine, estimated dates for miles and hours, what Health and Finance hold, hosting on the shared github.io origin, no data copy from the old app, the scope of Delete all data, the 90-day estimate rule, seasonal tasks on fixed calendar dates, appliances, the Finance default thing, the account-number warning and meter changes (3.3b). Everything else is proposed; open items are in "Decisions needed" at the end.
 
 Sources read: CLAUDE.md, docs/decisions.md, docs/brief.md, docs/specs/v1-scope.md (draft, being revised in parallel), docs/reviews/privacy-security-2026-11-03.md, data.js, app.js, sw.js, index.html and manifest.webmanifest (storage names only).
 
@@ -261,10 +261,10 @@ Mileage tasks show **"<miles remaining> / <estimated date>"** and hours tasks **
 
 For combined items the date is always D, the earlier of the estimate and the time rule's due date, so the row shows when it's really due. Time-only items aren't in this table; they show their due date as v1-scope and the mockups define.
 
-### 3.3b Meter reset or replacement (proposed, needs owner decision)
+### 3.3b Meter reset or replacement (decided 2026-11-03: option A)
 An odometer or hour meter can go backward: a replaced engine or instrument cluster, a swapped hour meter, an old mechanical meter rolling over. Today nothing handles this. The math in 3.3 takes the **highest** reading as current, so a lower new reading is ignored: due values freeze at the old meter's numbers, and rule 2 of "enough readings" fails (the latest reading is lower than the earliest), so there's no estimated date either. The item sits in the wrong box until the new meter passes the old one's highest value.
 
-**Proposal: record the change, then shift the older readings.** A meter change is one `readings` row (2.3) with the date, the old meter's last value (`oldValue`) and the new meter's first value. Every reading of that meter on that thing dated before the change (or on the same date and created before it) is shifted by `new - old`, at read time. Stored values never change, so history shows what was typed; the shift is recalculated like due dates. With several changes, a reading is shifted by the sum of every later change. All of 3.3 then runs unchanged on the shifted values: current value, due value, left, rate, the 30-day and 90-day rules. Shifted values can be negative; that's fine for the math and never shown.
+**Decided: record the change, then shift the older readings.** A meter change is one `readings` row (2.3) with the date, the old meter's last value (`oldValue`) and the new meter's first value. Every reading of that meter on that thing dated before the change (or on the same date and created before it) is shifted by `new - old`, at read time. Stored values never change, so history shows what was typed; the shift is recalculated like due dates. With several changes, a reading is shifted by the sum of every later change. All of 3.3 then runs unchanged on the shifted values: current value, due value, left, rate, the 30-day and 90-day rules. Shifted values can be negative; that's fine for the math and never shown.
 
 - **How it's recorded:** when a fill-up, log or reading is lower than the current value, the form asks "That's lower than the last reading (150.0 hr). Was the meter replaced or reset?" Yes saves the entry plus a meter change with `oldValue` prefilled to the current value (editable). No means a typo; the user fixes the number. A "Meter replaced" action on the thing does the same without a regular entry.
 - **Swapped meter, same engine:** nothing else to do; schedules carry over exactly.
@@ -459,9 +459,4 @@ Not reversible: the user's exported CSV files are the only way back, which is wh
 
 ## Decisions needed (owner)
 
-Decided since the last draft and removed from this list: the old-app copy (dropped; CSV only), the seasonal rule (fixed calendar dates), the 90-day estimate rule, and the scope of Delete all data.
-
-1. **Meter reset or replacement (3.3b):**
-   - A. Record a meter change and shift older readings (new `meter`, `odometer` and `oldValue` fields on `readings`, two appended CSV columns). *(Recommended)*
-   - B. Nothing in v1: a lower reading is kept but ignored, and the item stays in the wrong box until the new meter passes the old value.
-   A changes stored data, so it needs the owner's approval before build.
+None open. Most recently decided: the old-app copy (dropped; CSV only), the seasonal rule (fixed calendar dates), the 90-day estimate rule, the scope of Delete all data, and meter reset or replacement (option A, 3.3b).

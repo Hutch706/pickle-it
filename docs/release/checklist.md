@@ -39,7 +39,7 @@ Everything here must be true before v1 goes public. Owned by release-manager. Dr
 - [ ] install-steps.md and README.md rewritten for Pickle It
 
 ## Hosting (needs owner go-ahead for every account, purchase and deploy)
-- [ ] GitHub Pages turned on for `Hutch706/pickle-it` (branch and folder chosen by the owner)
+- [ ] GitHub Pages turned on for `Hutch706/pickle-it` from `main`, folder `/` (decided 2026-11-03); turn on only with the owner's go-ahead
 - [ ] HTTPS working at `https://hutch706.github.io/pickle-it/`
 - [ ] Manifest, sw.js and all links still use relative paths (nothing starting with `/`)
 - [ ] Installed app opens and works offline at `/pickle-it/` on iPhone and Android

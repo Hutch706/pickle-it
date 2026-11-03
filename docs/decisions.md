@@ -1,6 +1,13 @@
 # Decision log
 Newest first. Each entry: date, decision, why. Only the owner makes decisions.
 
+## 2026-11-03 (Phase 2 follow-ups)
+- **Meter replaced or reset (data-model 3.3b, option A).** When a lower odometer or hour reading is entered, the app asks "Was the meter replaced or reset?" and records a meter change; older readings are shifted at read time so due math keeps working. Adds `meter`, `odometer` and `oldValue` fields to readings and two CSV columns. Why: without it the item sits in the wrong box until the new meter passes the old value.
+- **"Backup due" dot goes on the Pantry's Settings gear**, read aloud as "Settings, backup due".
+- **GitHub Pages serves from `main`, folder `/`.** Turning Pages on still waits for the owner's go-ahead.
+- **Vehicle battery check: yearly on Oct 1** (Fall Car Care Month).
+- **Still open:** generator oil interval.
+
 ## 2026-11-03 (Phase 2 open questions)
 - **The Vehicle Maintenance App has no users with data to move.** So: no read-only copy from the old app, no migration notice period, no old-app banner. CSV import of old-app files stays (it already works). Why: the owner confirmed nobody but them has data in it.
 - **Delete all data deletes only Pickle It's data** (the `pickle-it` database and `pickle-it:` keys). No option to delete the old app's data. Why: no old-app users to clean up after.
