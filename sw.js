@@ -1,8 +1,10 @@
-/* Vehicle Maintenance App: offline support.
+/* Pickle It: offline support.
    Network first, so changes you publish show up the next time the app opens. If the network is
-   missing or slow (3 seconds), the copy saved on the device is used instead. You don't need to bump
-   a version number when you edit the app; change CACHE only if you rename or remove files below. */
-const CACHE = "vehicle-maintenance-app-v1";
+   missing or slow (3 seconds), the copy saved on the device is used instead. Every file the app loads
+   is saved again each time it comes from the network, so edits never need a version bump here.
+   Keep FILES matching the app's files so a fresh install works offline right away; a file that's
+   missing from the server is skipped instead of stopping the install. */
+const CACHE = "pickle-it-v1";
 const FILES = [
   "./", "./index.html", "./app.css", "./data.js", "./app.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-maskable-512.png",
@@ -12,12 +14,13 @@ const TIMEOUT_MS = 3000;
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE)
-    .then((c) => c.addAll(FILES.map((u) => new Request(u, { cache: "reload" }))))
+    .then((c) => Promise.allSettled(FILES.map((u) => c.add(new Request(u, { cache: "reload" })))))
     .then(() => self.skipWaiting()));
 });
 
-// Remove this app's older caches, including those from when it was called Fill-Up Receipts.
-const OWN_CACHE = (k) => k.startsWith("vehicle-maintenance-app-") || k.startsWith("fillup-receipts-");
+// Remove this app's older caches. Only pickle-it- ones: the Vehicle Maintenance App may share this
+// web address (for example the same github.io account), and its caches aren't ours to delete.
+const OWN_CACHE = (k) => k.startsWith("pickle-it-");
 self.addEventListener("activate", (event) => {
   event.waitUntil(caches.keys()
     .then((keys) => Promise.all(keys.filter((k) => OWN_CACHE(k) && k !== CACHE).map((k) => caches.delete(k))))

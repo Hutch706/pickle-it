@@ -1,5 +1,5 @@
 "use strict";
-/* Vehicle Maintenance App: screens and interactions. Storage, math and CSV are in data.js. */
+/* Pickle It: screens and interactions. Storage, math and CSV are in data.js. */
 
 // ---------- Helpers ----------
 const $ = (id) => document.getElementById(id);
@@ -49,7 +49,7 @@ function armedButton(label, armedLabel, action) {
 }
 
 // ---------- Saving: write, tell other open tabs, redraw ----------
-const bc = "BroadcastChannel" in self ? new BroadcastChannel("vehicle-maintenance-app") : null;
+const bc = "BroadcastChannel" in self ? new BroadcastChannel("pickle-it") : null;
 if (bc) bc.onmessage = async () => { await reload(); renderAll(); };
 let persistState = null, persistAsked = false;
 async function persistOnce() {
@@ -860,17 +860,17 @@ $("shopAdd").addEventListener("submit", async (ev) => {
 // ---------- Settings: Light / Dark / System and color palette ----------
 // Saved on this device as vma:theme and vma:palette. The <head> script applies them before the page draws.
 const PALETTES = [
-  ["blue", "Blue"], ["green", "Green"], ["red", "Red"], ["orange", "Orange"],
+  ["green", "Green"], ["blue", "Blue"], ["red", "Red"], ["orange", "Orange"],
   ["purple", "Purple"], ["teal", "Teal"], ["mono", "Monochrome"],
 ];
 function applyAppearance() {
   const root = document.documentElement;
   const mode = pref.get("theme", "system");
-  const pal = pref.get("palette", "blue");
+  const pal = pref.get("palette", "green");
   if (mode === "light" || mode === "dark") root.dataset.theme = mode; else delete root.dataset.theme;
-  if (pal !== "blue" && PALETTES.some(([k]) => k === pal)) root.dataset.palette = pal; else delete root.dataset.palette;
+  if (pal !== "green" && PALETTES.some(([k]) => k === pal)) root.dataset.palette = pal; else delete root.dataset.palette;
   for (const b of document.querySelectorAll("#modePick [data-mode]")) b.setAttribute("aria-pressed", String(b.dataset.mode === mode));
-  const sel = $("palettePick"); if (sel) sel.value = PALETTES.some(([k]) => k === pal) ? pal : "blue";
+  const sel = $("palettePick"); if (sel) sel.value = PALETTES.some(([k]) => k === pal) ? pal : "green";
   // Match the phone's status bar / browser toolbar to the page background.
   const bg = getComputedStyle(root).getPropertyValue("--bg").trim();
   for (const m of document.querySelectorAll('meta[name="theme-color"]')) m.setAttribute("content", bg);

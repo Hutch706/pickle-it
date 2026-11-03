@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Vehicle Maintenance App</title>
-<meta name="description" content="Log fill-ups, track MPG and maintenance. Your data stays on your device.">
+<title>Pickle It</title>
+<meta name="description" content="Keep up with maintenance on the things you own. Your data stays on your device.">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#f3f5f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f151b" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f2f4f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f140f" media="(prefers-color-scheme: dark)">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Maintenance">
+<meta name="apple-mobile-web-app-title" content="Pickle It">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
@@ -21,7 +21,7 @@
   try {
     var t = localStorage.getItem("vma:theme"), p = localStorage.getItem("vma:palette");
     if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
-    if (p && p !== "blue") document.documentElement.dataset.palette = p;
+    if (p && p !== "green") document.documentElement.dataset.palette = p;
   } catch (e) {}
 </script>
 <link rel="stylesheet" href="app.css">
@@ -37,7 +37,7 @@
   <!-- ================= LOG ================= -->
   <section class="screen" id="screen-log" aria-labelledby="logTitle">
     <header>
-      <h1 id="logTitle">Vehicle Maintenance App</h1>
+      <h1 id="logTitle">Pickle It</h1>
       <p class="sub">Log each fill-up to track MPG and maintenance. Everything is saved on this device.</p>
     </header>
 

@@ -1,5 +1,5 @@
 "use strict";
-/* Vehicle Maintenance App: the data layer. No screens in here.
+/* Pickle It: the data layer. No screens in here.
    - Storage: IndexedDB in this browser. No server, no accounts.
    - Math: MPG and maintenance due mileage.
    - Backup: CSV export and import (with a preview plan before anything is saved).
@@ -268,8 +268,11 @@ const dueSoonAll = () => S.vehicles.filter((v) => v.active).map((v) => maintStat
 // ---------- CSV export ----------
 // One file with everything: vehicles and their schedules, shops, fill-ups and the maintenance log.
 // record_type says what each row is. Dates are YYYY-MM-DD. Columns that don't apply to a row are left blank.
+// format_version is on every row. Bump CSV_FORMAT_VERSION whenever the columns or their meaning change;
+// files without it (Vehicle Maintenance App backups) are version 1.
+const CSV_FORMAT_VERSION = 1;
 const CSV_COLUMNS = ["record_type", "vehicle", "date", "odometer", "gallons", "price_per_gallon", "total", "station", "missed",
-  "shop", "item", "notes", "every_mi", "remind_mi", "active", "vehicle_id", "item_id", "visit", "id", "created_at"];
+  "shop", "item", "notes", "every_mi", "remind_mi", "active", "vehicle_id", "item_id", "visit", "id", "created_at", "format_version"];
 const CSV_TEXT = new Set(["vehicle", "station", "shop", "item", "notes"]);
 // Excel runs text starting with = + - @ as a formula. Such text gets a leading ' on export, removed again on import.
 const FORMULA_START = /^'*[=+\-@\t\r]/;
@@ -281,7 +284,7 @@ function csvCell(col, value) {
 }
 function buildCSV() {
   const lines = [CSV_COLUMNS.join(",")];
-  const add = (o) => lines.push(CSV_COLUMNS.map((c) => csvCell(c, o[c])).join(","));
+  const add = (o) => lines.push(CSV_COLUMNS.map((c) => csvCell(c, c === "format_version" ? CSV_FORMAT_VERSION : o[c])).join(","));
   const order = new Map(S.vehicles.map((v, i) => [v.id, i]));
   const vName = (id) => vehicleById(id)?.name ?? "";
   const byVehicleThenDate = (a, b) => (order.get(a.vehicleId) ?? 1e9) - (order.get(b.vehicleId) ?? 1e9) || cmp(a.date, b.date)
@@ -295,7 +298,7 @@ function buildCSV() {
     item: m.itemName, notes: m.notes, vehicle_id: m.vehicleId, item_id: m.itemId, visit: m.visit, id: m.id, created_at: m.createdAt });
   return lines.join("\r\n") + "\r\n";
 }
-const exportFileName = () => `vehicle-maintenance-app-${today()}.csv`;
+const exportFileName = () => `pickle-it-${today()}.csv`;
 
 // ---------- CSV import: reading the file ----------
 async function readTextFile(file) {
@@ -401,7 +404,7 @@ const TYPE_NAMES = { vehicle: "vehicle", vehicles: "vehicle", schedule: "schedul
 function analyzeImport(text) {
   const out = { fatal: null, bad: [], vehicles: [], schedule: [], shops: [], fillups: [], services: [], rows: 0 };
   if (!text.trim()) { out.fatal = "This file is empty."; return out; }
-  if (/[\u0000-\u0008\u000e-\u001f]/.test(text.slice(0, 4000))) { out.fatal = "This isn't a CSV file. Choose the .csv file you exported from Vehicle Maintenance App."; return out; }
+  if (/[\u0000-\u0008\u000e-\u001f]/.test(text.slice(0, 4000))) { out.fatal = "This isn't a CSV file. Choose the .csv file you exported from Pickle It or Vehicle Maintenance App."; return out; }
   const delim = detectDelimiter(text);
   const { rows, unclosedAt } = parseCSV(text, delim);
   const hi = rows.findIndex((r) => r.cells.some((c) => c.trim()));
@@ -409,7 +412,7 @@ function analyzeImport(text) {
   const col = {};
   rows[hi].cells.map(normalizeHeader).forEach((h, i) => { if (h && !(h in col)) col[h] = i; });
   if (!("record_type" in col)) {
-    out.fatal = "This doesn't look like a Vehicle Maintenance App backup. Its first row should be the column names, starting with record_type.";
+    out.fatal = "This doesn't look like a Pickle It backup. Its first row should be the column names, starting with record_type.";
     return out;
   }
   const decimalComma = delim === ";";
@@ -417,6 +420,12 @@ function analyzeImport(text) {
   const text1 = (r, name) => unFormula(cell(r, name));
   const data = rows.slice(hi + 1).filter((r) => r.cells.some((c) => c.trim()));
   out.rows = data.length;
+  for (const r of data) {
+    const raw = cell(r, "format_version"), v = Number(raw);
+    if (!raw) continue;
+    if (!Number.isInteger(v) || v < 1) { out.fatal = `Line ${r.line}: format_version “${raw}” isn't a version number.`; return out; }
+    if (v > CSV_FORMAT_VERSION) { out.fatal = "This backup was made by a newer version of Pickle It. Update the app (close it fully and open it again), then import the file again."; return out; }
+  }
 
   // Day-first dates (D/M/YYYY) if any slash date in the file can only be read that way.
   let df = 0, mf = 0;

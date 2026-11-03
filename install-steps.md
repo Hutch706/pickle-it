@@ -1,6 +1,6 @@
-# How to install Vehicle Maintenance App
+# How to install Pickle It
 
-Link: **https://YOUR-USERNAME.github.io/vehicle-maintenance-app/**
+Link: **https://YOUR-USERNAME.github.io/pickle-it/**
 
 It's free, has no account, and keeps your data on your own phone or computer. Install it so it has its own icon and works offline.
 

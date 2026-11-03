@@ -1,22 +1,22 @@
-/* Vehicle Maintenance App: styles.
+/* Pickle It: styles.
    One narrow column built for a phone at the pump; the amber pump readout is the one loud element.
    Colors are variables on :root, with dark values under prefers-color-scheme: dark. */
 
 :root {
-  --bg: #f3f5f7;
+  --bg: #f2f4f0;
   --surface: #ffffff;
-  --ink: #16212b;
-  --muted: #5b6875;
-  --line: #d9dfe5;
-  --accent: #0f5c8c;
+  --ink: #1a221c;
+  --muted: #5d6a60;
+  --line: #d8ded6;
+  --accent: #2f6b3f;
   --accent-ink: #ffffff;
-  --run: #c0392b;
-  --display-bg: #121a21;
-  --display-fg: #ffb547;
-  --ok: #2e7d4f;
-  --ok-bg: #e3f2e9;
-  --wait: #8a5a00;
-  --wait-bg: #fdf0d5;
+  --run: #b5562a;
+  --display-bg: #141a15;
+  --display-fg: #c8e66a;
+  --ok: #1f7a5a;
+  --ok-bg: #e1f1e8;
+  --wait: #85600a;
+  --wait-bg: #f8eed3;
   --err: #b3261e;
   --err-bg: #fbe9e7;
   --font-display: "Avenir Next Condensed", "Bahnschrift SemiCondensed", "Bahnschrift", "Roboto Condensed", "sans-serif-condensed", "Arial Narrow", system-ui, sans-serif;
@@ -27,42 +27,42 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0f151b; --surface: #18212a; --ink: #e6ecf1; --muted: #9aa8b5; --line: #2a3742;
-    --accent: #4fa3d9; --accent-ink: #0b1218; --run: #ff8a65; --display-bg: #070b0f; --display-fg: #ffb547;
-    --ok: #7fd3a0; --ok-bg: #173325; --wait: #f0c46a; --wait-bg: #3a2c0f; --err: #ff8a80; --err-bg: #3b1714;
+    --bg: #0f140f; --surface: #182019; --ink: #e5ece5; --muted: #9aaa9c; --line: #2a362c;
+    --accent: #7cc48d; --accent-ink: #0c140e; --run: #ff9a6b; --display-bg: #070a07; --display-fg: #c8e66a;
+    --ok: #86d6b0; --ok-bg: #163126; --wait: #f0c46a; --wait-bg: #382b0e; --err: #ff8a80; --err-bg: #3b1714;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0f151b; --surface: #18212a; --ink: #e6ecf1; --muted: #9aa8b5; --line: #2a3742;
-  --accent: #4fa3d9; --accent-ink: #0b1218; --run: #ff8a65; --display-bg: #070b0f; --display-fg: #ffb547;
-  --ok: #7fd3a0; --ok-bg: #173325; --wait: #f0c46a; --wait-bg: #3a2c0f; --err: #ff8a80; --err-bg: #3b1714;
+  --bg: #0f140f; --surface: #182019; --ink: #e5ece5; --muted: #9aaa9c; --line: #2a362c;
+  --accent: #7cc48d; --accent-ink: #0c140e; --run: #ff9a6b; --display-bg: #070a07; --display-fg: #c8e66a;
+  --ok: #86d6b0; --ok-bg: #163126; --wait: #f0c46a; --wait-bg: #382b0e; --err: #ff8a80; --err-bg: #3b1714;
   color-scheme: dark;
 }
 
 /* ---------- Color palettes ----------
    Picked on the Settings screen (saved on the device as vma:palette and set as data-palette on <html>).
-   "Blue" is the default above. Each palette below has a light block and a dark block; the dark block is
+   "Green" is the default above. Each palette below has a light block and a dark block; the dark block is
    written twice (system dark mode, and Dark picked in Settings), like the defaults above. To add a palette,
    copy one, rename it, and add it to PALETTES in app.js. */
 
-/* Green */
-:root[data-palette="green"] {
-    --bg: #f2f4f0; --surface: #ffffff; --ink: #1a221c; --muted: #5d6a60; --line: #d8ded6;
-    --accent: #2f6b3f; --accent-ink: #ffffff; --run: #b5562a; --display-bg: #141a15; --display-fg: #c8e66a;
-    --ok: #1f7a5a; --ok-bg: #e1f1e8; --wait: #85600a; --wait-bg: #f8eed3; --err: #b3261e;
+/* Blue (the Vehicle Maintenance App default) */
+:root[data-palette="blue"] {
+    --bg: #f3f5f7; --surface: #ffffff; --ink: #16212b; --muted: #5b6875; --line: #d9dfe5;
+    --accent: #0f5c8c; --accent-ink: #ffffff; --run: #c0392b; --display-bg: #121a21; --display-fg: #ffb547;
+    --ok: #2e7d4f; --ok-bg: #e3f2e9; --wait: #8a5a00; --wait-bg: #fdf0d5; --err: #b3261e;
 }
 @media (prefers-color-scheme: dark) {
-  :root[data-palette="green"]:not([data-theme="light"]) {
-    --bg: #0f140f; --surface: #182019; --ink: #e5ece5; --muted: #9aaa9c; --line: #2a362c;
-    --accent: #7cc48d; --accent-ink: #0c140e; --run: #ff9a6b; --display-bg: #070a07; --display-fg: #c8e66a;
-    --ok: #86d6b0; --ok-bg: #163126; --wait: #f0c46a; --wait-bg: #382b0e; --err: #ff8a80;
+  :root[data-palette="blue"]:not([data-theme="light"]) {
+    --bg: #0f151b; --surface: #18212a; --ink: #e6ecf1; --muted: #9aa8b5; --line: #2a3742;
+    --accent: #4fa3d9; --accent-ink: #0b1218; --run: #ff8a65; --display-bg: #070b0f; --display-fg: #ffb547;
+    --ok: #7fd3a0; --ok-bg: #173325; --wait: #f0c46a; --wait-bg: #3a2c0f; --err: #ff8a80;
   }
 }
-:root[data-palette="green"][data-theme="dark"] {
-    --bg: #0f140f; --surface: #182019; --ink: #e5ece5; --muted: #9aaa9c; --line: #2a362c;
-    --accent: #7cc48d; --accent-ink: #0c140e; --run: #ff9a6b; --display-bg: #070a07; --display-fg: #c8e66a;
-    --ok: #86d6b0; --ok-bg: #163126; --wait: #f0c46a; --wait-bg: #382b0e; --err: #ff8a80;
+:root[data-palette="blue"][data-theme="dark"] {
+    --bg: #0f151b; --surface: #18212a; --ink: #e6ecf1; --muted: #9aa8b5; --line: #2a3742;
+    --accent: #4fa3d9; --accent-ink: #0b1218; --run: #ff8a65; --display-bg: #070b0f; --display-fg: #ffb547;
+    --ok: #7fd3a0; --ok-bg: #173325; --wait: #f0c46a; --wait-bg: #3a2c0f; --err: #ff8a80;
 }
 
 /* Red */

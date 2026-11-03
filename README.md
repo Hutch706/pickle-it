@@ -1,4 +1,4 @@
-# Vehicle Maintenance App
+# Pickle It
 
 Log fill-ups, track MPG, and keep up with maintenance. It's an installable web app (PWA) that works offline on iPhone, Android, Windows and Mac. There's no server and no account: each person's data is saved in their own browser, on their own device.
 
@@ -22,13 +22,13 @@ You only need a web browser. About 10 minutes the first time.
 
 1. Go to [github.com](https://github.com) and sign in, or create a free account.
 2. Click **+** at the top right, then **New repository**.
-3. Name it something short, like `vehicle-maintenance-app`. This becomes part of the web address. Choose **Public** (free GitHub Pages needs a public repository; the code is public, but nobody's data is, because data never leaves their device). Click **Create repository**.
+3. Name it something short, like `pickle-it`. This becomes part of the web address. Choose **Public** (free GitHub Pages needs a public repository; the code is public, but nobody's data is, because data never leaves their device). Click **Create repository**.
 4. On the new, empty repository page, click the **uploading an existing file** link.
-5. Unzip `vehicle-maintenance-app.zip` on your computer. Open the folder and drag **everything inside it** (the files and the `icons` folder) into the upload box. Don't drag the outer folder itself, or the app ends up one level too deep.
+5. Unzip `pickle-it.zip` on your computer. Open the folder and drag **everything inside it** (the files and the `icons` folder) into the upload box. Don't drag the outer folder itself, or the app ends up one level too deep.
 6. Check that the list shows `index.html`, `app.css`, `app.js`, `data.js`, `sw.js`, `manifest.webmanifest`, `README.md`, `install-steps.md` and the files in `icons/`. Click **Commit changes**.
 7. Click **Settings** (top of the repository), then **Pages** in the left sidebar.
 8. Under **Build and deployment**, set **Source** to **Deploy from a branch**, then set **Branch** to **main** and the folder to **/ (root)**. Click **Save**.
-9. Wait a minute or two and refresh the Pages settings page. It will say **Your site is live at** `https://YOUR-USERNAME.github.io/vehicle-maintenance-app/`. Open that link to check it.
+9. Wait a minute or two and refresh the Pages settings page. It will say **Your site is live at** `https://YOUR-USERNAME.github.io/pickle-it/`. Open that link to check it.
 10. Share that link, along with the steps in `install-steps.md`.
 
 **Keep the address the same once people use it.** Each person's data is tied to the web address. If you rename the repository or move the app, their data stays behind at the old address; they'd have to export from the old one and import into the new one.
@@ -37,11 +37,11 @@ You only need a web browser. About 10 minutes the first time.
 
 Open the file on GitHub, click the pencil icon, make your change and click **Commit changes**. Or use **Add file → Upload files** to replace files. The site updates within a minute or two, and installed copies pick up the change the next time they're opened with a connection (if it doesn't show right away, close the app fully and open it again).
 
-You don't need to bump a version number in `sw.js` when you edit. Only change `CACHE` there if you rename, add or remove files, and update the `FILES` list to match.
+You don't need to bump a version number in `sw.js` when you edit. The service worker refreshes its saved copy of every file each time the app opens online, and a file missing from `FILES` doesn't stop it from installing. Still keep `FILES` matching the app's files, so a fresh install has everything offline from the start.
 
 ### Cloudflare Pages instead
 
-In the Cloudflare dashboard, create a Pages project using direct upload and drop in the unzipped folder's contents. You get an address like `https://vehicle-maintenance-app.pages.dev`. Everything else is the same.
+In the Cloudflare dashboard, create a Pages project using direct upload and drop in the unzipped folder's contents. You get an address like `https://pickle-it.pages.dev`. Everything else is the same.
 
 ## Trying changes on your own computer
 
@@ -70,6 +70,8 @@ One file holds everything needed to rebuild the app on another device. It opens 
 | `shop` | A shop from the list | `shop` |
 | `fillup` | A fill-up | `vehicle`, `date`, `odometer`, `gallons`, `price_per_gallon`, `total` (receipt total, optional), `station`, `missed` (yes or blank), `vehicle_id`, `id`, `created_at` |
 | `maintenance` | One logged service | `vehicle`, `date`, `odometer`, `shop`, `item`, `notes`, `vehicle_id`, `item_id`, `visit`, `id`, `created_at` |
+
+Every row also has `format_version` (currently 1), so a future format change can be recognized; files without that column, such as Vehicle Maintenance App backups, are read as version 1. A file with a higher version than the app knows is refused with a message to update the app.
 
 Dates are written as YYYY-MM-DD. Import also accepts what Excel writes when it re-saves the file (M/D/YYYY, D/M/YYYY or D.M.YYYY, semicolon-separated files, decimal commas). Text that starts with `=`, `+`, `-` or `@` gets a leading `'` in the file so Excel doesn't run it as a formula; import removes it again.
 
