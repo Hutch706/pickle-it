@@ -1,6 +1,6 @@
 # Pickle It v1 launch scope
 
-Status: draft for owner review, revised 2026-11-03 to the owner's Phase 1 decisions in docs/decisions.md. Items marked **(decided)** are logged there; everything else is a proposal until the owner logs it. Open items are in section 5.
+Status: draft for owner review, revised 2026-11-03 to the owner's Phase 1 and Phase 2 decisions in docs/decisions.md. Items marked **(decided)** are logged there; everything else is a proposal until the owner logs it. Open items are in section 5.
 
 ## 1. Problem and who it's for
 People own things that need regular care: cars that need oil changes, furnaces that need a fall tune-up, mowers that need winterizing, plus life admin that comes round on a schedule (a dental cleaning, a registration renewal). The reminders live in their heads, on stickers, or nowhere. Pickle It puts every upcoming task in one place, sorted by when it's due, on the phone they already carry.
@@ -9,7 +9,8 @@ v1 is for everyday people, not mechanics, contractors or clinicians:
 - Someone with one or more cars (dealer, independent shop, or DIY) who wants to know when service is due and what their MPG is.
 - A homeowner (or renter with some upkeep, like a yard or a window AC) who wants seasonal, yearly and small-engine reminders.
 - Someone who wants simple recurring reminders for health appointments and money deadlines, without the app holding medical or account details.
-- People already using the Vehicle Maintenance App, which Pickle It replaces, who need to move their data over before that app is deleted.
+
+The Vehicle Maintenance App, which Pickle It replaces, has no users with data to move **(decided)**, so there is no migration work beyond importing its CSV files (4.11).
 
 Assume a mix: some people track two cars and no home, some a home and no car, some a cabin and a truck, some only health and finance reminders.
 
@@ -36,14 +37,14 @@ Nothing yet for Home, Health or Finance, for time, hours or date recurrence, a c
 | Pantry home | In **(decided)** | Three due boxes (boundaries **decided**), 50-item caps, witty empty state |
 | Bottom tab bar | In **(decided)** | Pantry (cabinet icon) + one tab per visible jar; no Settings tab |
 | Hiding jars | In **(decided)** | Users can hide jars they don't use |
-| Inside each jar | No tabs inside jars **(decided)** | This spec lists what each jar must let you do, not how it's laid out |
-| Settings | In **(decided)** | Reached from the Pantry, with two tabs: App settings and Assets **(decided)**. Layout chosen from three mockups (open) |
+| Inside each jar | No tabs inside jars **(decided)** | Due boxes first, then the jar's things; a thing opens its own screen; a jar can link into Settings > Assets **(decided)** |
+| Settings | In **(decided)** | Reached from the Pantry, with two tabs: Assets (first) and App settings. Layout is Option C, docs/design/settings-option-c.html **(decided)** |
 | Onboarding | In | Short first-run flow |
 | Starter task libraries | In | Vehicles (from STANDARD_SCHEDULE, reviewed), Home (new), Health and Finance (small) |
 | Backup: CSV export / import | In | All jars; `format_version` on every row **(decided)**; one full export with a plain "not encrypted" warning **(decided)** |
-| Moving from the Vehicle Maintenance App | In | Must work before the old app is deleted **(decided)**; how is data-architect's call |
+| Vehicle Maintenance App files | Import only | Its CSV files import as today. No copy, notice period or banner: it has no users with data **(decided)** |
 | Units | Miles and gallons **(decided)** | |
-| Look | In **(decided)** | Follows app.css; Green default; all 7 palettes, each light and dark, plus Light / Dark / System |
+| Look | In **(decided)** | Follows app.css; Green default; all 7 palettes, each light and dark, plus Light / Dark / System. Phase 2 color fixes: `--err-ink`, per-palette `--line-strong`, backup dot in `--err` with screen-reader text, slightly darker light-mode `--ok` **(decided)** |
 | Storage | Local-only **(decided)** | Built so cloud storage can be added later; see section 7 |
 | Distribution | Installable web app (PWA) only **(decided)** | On the shared GitHub Pages address for now **(decided)**. Google Play maybe later; no App Store for v1 |
 | Push notifications, accounts, sync, AI receipt reading | Out | See section 6 |
@@ -66,7 +67,7 @@ Stories:
 - As a user, I can see at a glance which jar has something due this week.
 
 Acceptance criteria:
-1. A bottom tab bar is visible on the Pantry and every jar screen, and stays visible while the screen scrolls.
+1. A bottom tab bar is visible on the Pantry and every jar screen, and stays visible while the screen scrolls. It is hidden on Settings **(decided)**. It is built as navigation (links, with the current one marked as the current page), not as tabs **(decided)**.
 2. The far-left tab is Pantry, styled as the brief describes (raised solid rounded square in the palette's main color, white cabinet icon, thin divider after it).
 3. Each visible jar has one tab, in a fixed order: Vehicles, Home, Health, Finance. Hidden jars have no tab (4.10 AC 7).
 4. A jar tab shows a red dot when that jar has at least one task in This week (including overdue). The dot disappears when none remain.
@@ -83,17 +84,17 @@ Stories:
 - As a driver or mower owner, I see both how many miles or hours are left and roughly when that will be, so I can plan.
 
 Acceptance criteria:
-1. The header shows "PICKLE IT", "Your pantry", and "N things need attention this week", where N is the number of tasks in the This week box. N = 1 reads "1 thing needs attention this week".
-2. Three collapsible boxes appear in this order: This week, This month, Later.
+1. The header shows "PICKLE IT", "Your pantry", and "N things need attention this week", where N is the number of tasks in the This week box. N = 1 reads "1 thing needs attention this week"; N = 0 reads "Nothing needs attention this week" **(decided)**.
+2. Three collapsible boxes appear in this order: This week, This month, Later, with the hints "Overdue and the next 7 days", "In 1 to 4 weeks" and "4 weeks or more" **(decided)**.
 3. This week holds tasks overdue or due today through today + 6 days **(decided)**. Overdue tasks are listed first and labeled "Overdue" with the due badge color.
 4. This month holds tasks due from today + 7 through today + 27 days **(decided)**.
 5. Later holds tasks due from today + 28 days onward **(decided)**, plus tasks with no due date yet (data-model 3.7).
 6. Within each box, tasks are sorted as data-model 3.7 defines (overdue first, then by due date, then by units left, then jar, thing and task name).
-7. Each box shows at most 50 tasks. When more exist, the box ends with "N more" and a way to see them in their jars. The header count in AC 1 counts all This week tasks, not only the 50 shown.
+7. Each box shows at most 50 tasks. When more exist, the box ends with "Showing 50 of N" and a link to each jar holding the rest **(decided)**. The header count in AC 1 counts all This week tasks, not only the 50 shown.
 8. Each task row shows the task name, the thing name ("2019 Civic", "Main house", "Mower", "Me"), the jar icon, and the due text in 4.2a. Nothing else: no notes, provider or history (4.6).
-9. When This week is empty, it shows one witty canning line (e.g. "Everything's sealed tight. Nothing to pickle this week."). Lines can rotate; final copy comes from release-manager / ux-designer.
+9. When This week is empty, it shows one witty canning line (e.g. "Everything's sealed tight. Nothing to pickle this week."). Lines rotate, using the lines in docs/design/system.md, pun included **(decided)**.
 10. Each box can be collapsed and expanded; the choice is remembered on the device.
-11. A user can mark a task done from its row. Done asks for the date (default today) and, for miles or hours tasks, the current reading (default the latest known). Saving recalculates the next due date and moves the task to the right box immediately.
+11. Tapping a task row opens its quick actions in place (not swipe) **(decided)**: Done, Skip ("Skip this time"), and Add reading for miles and hours tasks (Open for other tasks). Only one row is open at a time. Done and Skip offer Undo for 8 seconds **(decided)**. Done asks for the date (default today) and, for miles or hours tasks, the current reading (default the latest known). Saving recalculates the next due date and moves the task to the right box immediately.
 12. When the user has no things at all, the Pantry shows a first-step prompt to set something up instead of three empty boxes.
 13. The screen scrolls above the tab bar; the last row is never hidden behind it.
 14. The Pantry has a control that opens Settings (4.10). Its accessible name is "Settings".
@@ -103,20 +104,21 @@ The same due text is used on the Pantry and wherever a task's next due shows in 
 
 Decided:
 1. A mileage task with an estimated date shows "<miles remaining> / <estimated date>", e.g. "1,200 mi / Dec 12" **(decided)**. No "about", "~" or "est." label **(decided)**.
-2. An hours-of-use task with an estimated date shows "<hours remaining> / <estimated date>", e.g. "6.5 hrs / Jun 3" **(decided)**. The date is estimated from hours per day between readings **(decided)**.
+2. An hours-of-use task with an estimated date shows "<hours remaining> / <estimated date>", e.g. "6.5 hr / Jun 3, 2027" **(decided)**. The date is estimated from hours per day between readings **(decided)**.
+3. A date is estimated only when the latest reading is under 90 days old and two readings are at least 30 days apart **(decided)**; data-model 3.3 has the exact rule.
 
-Proposed (formatting):
-3. Miles are whole numbers with a thousands separator and "mi". Hours show at most one decimal, dropping ".0", with "hr" for exactly 1 and "hrs" otherwise.
-4. Dates show as "Mon D" (e.g. "Dec 12"); a date not in the current year adds the year ("Jan 4, 2027").
-5. Time and fixed-date tasks show "Overdue", "Today", "Tomorrow", "in N days" (2-6 days), or the date (7 days or more).
-6. Screen readers hear the words in full, e.g. "1,200 miles left, estimated December 12" and "6.5 hours left, estimated June 3", so the estimate is clear even though the visual text has no label.
-7. A combined task (miles + time, or hours + time **(decided)**) shows the miles or hours remaining and the earlier of the estimated date and the time rule's due date, e.g. "1,200 mi / Nov 30". The date shown is always the date that placed the task in its box.
+Formatting:
+4. Miles are whole numbers with a thousands separator and "mi". Hours show at most one decimal, dropping ".0", and always use "hr", e.g. "1 hr", "6.5 hr" **(decided)**.
+5. Dates show as "Mon D" (e.g. "Dec 12"). Estimated dates more than about 6 months away add the year ("Jun 3, 2027") **(decided)**.
+6. Time and fixed-date tasks show "Today", "Tomorrow", "in N days" (2-6 days), or the date (7 days or more). Overdue ones show the "Overdue" badge and "since <date>".
+7. Screen readers hear the words in full, e.g. "1,200 miles left, estimated December 12" and "6.5 hours left, estimated June 3, 2027", so the estimate is clear even though the visual text has no label.
+8. A combined task (miles + time, or hours + time **(decided)**) shows the miles or hours remaining and the earlier of the estimated date and the time rule's due date, e.g. "1,200 mi / Nov 30". The date shown is always the date that placed the task in its box.
 
-Proposed, **needs a decision (D11)** — when a meter task can't show the decided format:
-8. **No estimate yet** (fewer than two readings, readings too close together, or no change between them; data-model 3.3 sets the exact rule): show the remaining amount only, e.g. "1,200 mi" or "6.5 hrs". The task's detail view says "Add another reading to see a date". The task is placed by the remind window (data-model 3.4).
-9. **Overdue by reading**: "<amount> over / Overdue", e.g. "300 mi over / Overdue".
-10. **Estimated date has passed but no reading shows it's due yet**: "<amount> / Today", e.g. "150 mi / Today" (due, not overdue, data-model 3.6), until a new reading moves it.
-11. **No reading at all**: "Add a reading" (data-model 3.3).
+When a meter task can't show "<remaining> / <date>" **(decided)**; same wording for miles and hours:
+9. **No estimate**: the remaining amount only, e.g. "63 hr" or "1,200 mi". Screen readers hear "63 hours left. No date estimated yet." The task is placed by the remind window (data-model 3.4).
+10. **Overdue by reading** (the latest real reading is past the due reading): the "Overdue" badge plus "<amount> over", e.g. "5.5 hr over", "120 mi over". No date.
+11. **Due now**: exactly 0 left, or the estimated date has passed with no new reading. Shows "Due now" (due, not overdue, data-model 3.6) until a new reading moves it. Screen readers also hear that adding a reading will update it.
+12. **No reading at all**: "Add a reading", for miles and hours alike.
 
 ### 4.3 Recurrence (all jars)
 Tasks can repeat by any measure **(decided)**. Stories:
@@ -142,7 +144,7 @@ Stories:
 - As a driver, I can log a fill-up or a service in a few taps.
 
 Acceptance criteria:
-1. All current features remain: add / edit / delete vehicles (walkthrough), log fill-ups, log maintenance, MPG per vehicle and lifetime, maintenance due list, recent fill-ups, service history, shops list, MPG outlier warning, missed fill-up handling. Logging and viewing live in the Vehicles jar; editing vehicles and their tasks lives in Settings > Assets (4.10). The jar has no tabs inside it **(decided)**; its layout is the ux-designer's to mock.
+1. All current features remain: add / edit / delete vehicles (walkthrough), log fill-ups, log maintenance, MPG per vehicle and lifetime, maintenance due list, recent fill-ups, service history, shops list, MPG outlier warning, missed fill-up handling. Logging and viewing live in the Vehicles jar; editing vehicles and their tasks lives in Settings > Assets (4.10). The jar has no tabs inside it **(decided)**: due boxes first, then the jar's things, and a thing opens its own screen **(decided)**. This applies to every jar.
 2. Mileage schedule behavior is unchanged: "every N miles" and "remind N miles before", and existing due-mileage math gives the same results as today.
 3. A vehicle task can also use any time measure in 4.3 (e.g. "every 12 months" for a cabin air filter), or miles + time (4.3 AC 6).
 4. Every vehicle task appears in the Pantry boxes using its due date and the due text in 4.2a.
@@ -163,9 +165,10 @@ Acceptance criteria:
 4. A user can add a custom task, edit any task's fields, and delete a task.
 5. Marking a task done records the date (and reading for hours tasks, and optional notes) in history and recalculates the next due date.
 6. A user can update a small engine's hour reading without marking a task done.
-7. The user can see each home's and engine's tasks by due date and a history of completed tasks. Layout is the ux-designer's to mock, with no tabs inside the jar.
+7. The user can see each home's and engine's tasks by due date and a history of completed tasks, laid out as in 4.4 AC 1.
 8. Home tasks appear in the Pantry boxes and drive the Home jar's red dot.
-9. Appliances: see D12 (own thing, like small engines, or tasks on a home).
+9. An appliance can be its own thing (e.g. "Furnace"), like a small engine but without hours; the starter library puts appliance tasks on the home by default **(decided)**.
+10. Seasonal tasks use fixed calendar dates **(decided)**.
 
 ### 4.6 Health and Finance jars
 **Health tracks recurring appointments and renewals per person, with no medical fields (decided). Finance tracks money deadlines only, with no amounts (decided).** Both reuse the Home engine: things with time or fixed-date tasks, done logs and notes. No new measures, no new screens beyond what Home needs. Privacy guidance below comes from docs/reviews/privacy-security-2026-11-03.md section 2.
@@ -177,7 +180,7 @@ Stories:
 
 What they hold (examples for the starter libraries, 4.8):
 - Health things are people: "Me" plus family members by first name. Tasks: annual physical, dental cleaning every 6 months, eye exam, flu shot each fall, prescription refill every 30 days, contact lens replacement.
-- Finance things are households or accounts the user names ("Household", "Rental"; see D13). Tasks: quarterly estimated taxes, annual insurance renewal, property tax, check credit report, review subscriptions, annual budget check-in.
+- Finance things are households or accounts the user names ("Household", "Rental"), default "Household" **(decided)**. Tasks: quarterly estimated taxes, annual insurance renewal, property tax, check credit report, review subscriptions, annual budget check-in.
 
 Acceptance criteria:
 1. Health and Finance each let the user have several things **(decided)** (people / households), with a first default ("Me" / "Household"). Adding, renaming and deleting them is in Settings > Assets.
@@ -193,14 +196,14 @@ Acceptance criteria:
 8. A user can hide the Health and Finance jars (as any jar, 4.10 AC 7) **(decided)**. A hidden jar's tasks leave the Pantry and the tab bar; its data is kept and comes back when the jar is shown again.
 9. Help copy (release-manager) suggests discreet task names for sensitive things ("Dr. visit" instead of the condition) **(decided: discreet task names)**.
 10. The export warning in 4.9 AC 7 covers Health and Finance.
-11. Proposed, **needs a decision (D14)**: a soft warning, not a block, when a Health or Finance name or note contains a run of 9 or more digits or a likely card number (13-19 digits passing a Luhn check): "This looks like an account or ID number. Pickle It backups aren't encrypted. Save anyway?" Checked on the device only; nothing about the check is stored.
+11. In v1 **(decided)**: a soft warning, not a block, when a Health or Finance name or note contains a run of 9 or more digits or a likely card number (13-19 digits passing a Luhn check): "This looks like an account or ID number. Pickle It backups aren't encrypted. Save anyway?" Checked on the device only; nothing about the check is stored.
 
 Later, not v1: a per-jar "hide names" setting that shows "Health task" instead of names on the Pantry (v1.1 **(decided)**); optional Finance amounts after a privacy review **(decided)**. See section 6.
 
 ### 4.7 Onboarding (first run)
 Stories:
 - As a new user, I understand what the app does and have my first thing set up in under two minutes.
-- As a Vehicle Maintenance App user, I can bring my data over instead of starting again.
+- As someone with a backup file (Pickle It or Vehicle Maintenance App), I can import it instead of starting again.
 
 Acceptance criteria:
 1. First run shows a single welcome screen: what Pickle It is, and that data stays on this device (local-only **(decided)**).
@@ -209,15 +212,16 @@ Acceptance criteria:
 4. "Import a backup" opens the import flow and accepts both Pickle It backups and Vehicle Maintenance App files (4.11).
 5. After setup the user lands on the Pantry, which already shows their tasks.
 6. Onboarding never shows again once completed or skipped, except after "Delete all data" (4.10 AC 12). The same setup paths stay available from the empty Pantry and from each jar.
-7. Proposed: jars the user didn't pick start hidden, and the last step says they can be shown in Settings. If the user skips, all jars show.
+7. Jars the user didn't pick start hidden **(decided)**, and the last step says they can be shown in Settings. If the user skips, all jars show.
 
 ### 4.8 Starter task libraries (scope only; content by maintenance-content-curator)
-1. Vehicles: start from `STANDARD_SCHEDULE` (8 items). The curator reviews intervals and adds time limits where they apply (miles + time **(decided)**). Target 8-12 tasks. Vehicle registration lives here.
+1. Vehicles: start from `STANDARD_SCHEDULE` (8 items). The curator reviews intervals and adds time limits where they apply (miles + time **(decided)**). Keep all 12 vehicle tasks, with the monthly tire check paused by default; engine air filter every 30,000 mi or 1 year; battery check yearly in fall **(decided)**. Vehicle registration lives here.
 2. Home: physical upkeep, medium and large appliances, yard work and small engines, including the brief's examples (spring AC tune-up, fall furnace tune-up, winterizing outdoor small engines) and at least one hours-of-use task (e.g. mower oil change) and one fixed-date task (e.g. winter prep). Target 15-25 tasks.
 3. Small-engine hours tasks pair with a time limit ("every 50 hours or each spring", hours + time **(decided)**), so machines without an hour meter or with rare readings still come due.
-4. Health and Finance: 5-10 tasks each, within 4.6 (no medical or money fields). Insurance renewals live in Finance, so they don't show twice with Vehicles by default.
+4. Health and Finance: 5-10 tasks each, within 4.6 (no medical or money fields). Insurance renewals live in Finance, so they don't show twice with Vehicles by default. Estimated taxes are four yearly fixed-date tasks, with a note that the IRS may shift the dates **(decided)**.
+4a. Intervals with no source stay as marked, editable defaults **(decided)**. Home: CO alarm replacement uses the date printed on the alarm, with 7 years as the fallback **(decided)**. The generator oil interval is still open (docs/open-questions.md).
 5. Every library task is generic and safe for a non-expert ("Have a pro service the furnace", not repair instructions; "Schedule a dental cleaning", not medical advice; no tax or investment advice).
-6. Season dates: the curator picks a date per task, with fixed season starts as the fallback **(decided)**. Users can edit any date.
+6. Seasonal tasks are on fixed calendar dates. The curator picks a date per task, with fixed season starts as the fallback **(decided)**. Users can edit any date.
 7. Changing a library later doesn't change tasks users already have (same as today's vehicle behavior).
 
 ### 4.9 Backup, import and export
@@ -238,7 +242,7 @@ Acceptance criteria:
 10. Export, import, the storage note and install help live in Settings > App settings (4.10).
 
 ### 4.10 Settings
-Settings is reached from the Pantry and has its own tabs, App settings and Assets, instead of tabs inside each jar **(decided)**. The layout is chosen from three mockups by the ux-designer (all assets in one tab, a tab per category, and a designer's choice) and is not specified here. Every criterion below must hold for whichever layout the owner picks.
+Settings is reached from the Pantry and has its own tabs, Assets and App settings, instead of tabs inside each jar **(decided)**. The layout is Option C (docs/design/settings-option-c.html) **(decided)**: Assets first, with search (matching task names too) and jar filter chips; App settings second.
 
 Stories:
 - As a user, I can find all app-wide options (look, backup, install, storage) in one place reached from my Pantry.
@@ -247,15 +251,15 @@ Stories:
 - As a user who doesn't use a jar, I can hide it, and bring it back later without losing anything.
 
 **General**
-1. Settings opens from the Pantry in one tap (4.2 AC 14) and has a clear way back to the Pantry. It is not a tab in the bottom tab bar **(decided)**.
-2. Settings has exactly two tabs, named "App settings" and "Assets" **(decided)**. The selected tab is visually distinct and announced to screen readers as selected; tabs are reachable by keyboard.
+1. Settings opens from the Pantry in one tap (4.2 AC 14) and has a clear way back to the Pantry. It is not a tab in the bottom tab bar, and the bottom bar is hidden on Settings **(decided)**. A jar can also link into Settings > Assets **(decided)**.
+2. Settings has exactly two tabs, "Assets" then "App settings" **(decided)**. Assets opens first; after that, Settings reopens on the last tab used **(decided)**. The selected tab is visually distinct and announced to screen readers as selected; tabs are reachable by keyboard.
 3. Every control works at 320 px wide and with the largest system text size, with touch targets at least 44 x 44 px.
 4. Jars have no tabs inside them **(decided)**.
 
 **App settings tab**
 5. Appearance: Light / Dark / System, and the 7-palette picker with Green as the default **(decided)**. Changes apply immediately.
 6. Backup: Export (with the warning in 4.9 AC 7) and Import (preview, then Merge or Replace).
-7. Jars: a show/hide control for each of the four jars **(decided: users can hide jars)**. At least one jar must stay visible. Hiding a jar that has This week tasks first says "N tasks due this week in <jar> will leave your Pantry. Your data is kept." Showing it again restores its tab, tasks and red dot unchanged.
+7. Jars: a show/hide switch for each of the four jars, here in App settings **(decided)**. At least one jar must stay visible. Hiding a jar that has This week tasks first says "N tasks due this week in <jar> will leave your Pantry. Your data is kept." Showing it again restores its tab, tasks and red dot unchanged.
 8. Storage on this device: the existing note that data is kept only on this device, with the iOS eviction warning.
 9. Install as an app: the existing install help (iOS and Android steps).
 10. About: app version, and the privacy policy link once it exists.
@@ -264,89 +268,42 @@ Stories:
 **Delete all data**
 12. "Delete all data" asks the user to confirm at least twice **(decided)**:
     - a. First step: a dialog titled "Delete all Pickle It data?" that lists what goes (every thing, task, fill-up, reading, done history, shop, and settings on this device), says it can't be undone and can't be recovered by anyone, and offers "Export a backup first" (runs Export, then returns here), "Cancel" and "Continue". Focus starts on Cancel.
-    - b. Second step: a separate confirmation that needs a deliberate action different from the first tap, so a double tap can't pass both. Proposed (D15): type DELETE into a field, which enables a "Delete everything" button. Cancel is always available.
+    - b. Second step: the user types DELETE (any case) into a field, which enables a "Delete everything" button **(decided)**. A double tap can't pass both steps. Cancel is always available.
     - c. Cancel, Back, closing the dialog, or leaving the screen at either step changes nothing.
-    - d. On confirm: everything Pickle It stores on this device is removed: the `pickle-it` database contents and every `pickle-it:` setting (theme and palette return to System and Green). Data belonging to any other app on the same web address (the Vehicle Maintenance App) is never touched.
+    - d. On confirm, only Pickle It's data is removed **(decided)**: the whole `pickle-it` database is deleted in one step, and every `pickle-it:` localStorage key is removed, so theme and palette reset to System and Green **(decided)**. There is no option to delete the Vehicle Maintenance App's data **(decided)**; data belonging to any other app on the same web address is never touched.
     - e. The app then shows the first-run welcome (4.7), with no things and an empty Pantry. The installed app and its offline copy keep working; nothing needs a network connection.
     - f. Other open Pickle It windows or tabs on the same device show the empty state and don't write old data back.
     - g. If deleting fails partway, the app says so plainly and doesn't claim success; trying again finishes the job.
     - h. Only "Delete all data" deletes everything; no other control (Replace import aside, which already warns) does.
 
 **Assets tab**
-13. Lists every thing the user has, across all four jars, each shown with its jar and name, including things in hidden jars (marked as hidden) and inactive vehicles (marked as inactive). How it's grouped is the layout decision.
-14. The user can add, rename and delete: houses, small engines and appliances (Home, D12), vehicles (via the existing walkthrough, including starting odometer and active/inactive), family members (Health) and households (Finance).
+13. Lists every thing the user has, across all four jars, each shown with its jar and name, including things in hidden jars (marked as hidden) and inactive vehicles (marked as inactive). Grouping, search and jar filter chips follow Option C.
+14. The user can add, rename and delete: houses, small engines and appliances (Home, 4.5 AC 9), vehicles (via the existing walkthrough, including starting odometer and active/inactive), family members (Health) and households (Finance).
 15. For each thing, the user can see and edit all its tasks: add from the starter library, add a custom task, edit name, measure(s), remind window, notes and last done, pause, and delete.
 16. A small engine's hour reading can be edited (and a vehicle's starting odometer, as today).
 17. Deleting a thing asks for confirmation, names how many tasks and history entries go with it, and removes them. Deleting a task asks for confirmation; its past done history stays in the thing's history under the task's old name (data-model `itemName`).
 18. Changes made in Assets show immediately in the Pantry and jars.
-19. The shops list (shops, contractors, providers) stays editable; where it sits is part of the layout decision.
+19. The shops list (shops, contractors, providers) stays editable; where it sits follows Option C.
 
-### 4.11 Moving from the Vehicle Maintenance App
-Pickle It launches on the same GitHub Pages address as the Vehicle Maintenance App for now **(decided)**. Once Pickle It v1 is ready, the owner deletes the Vehicle Maintenance App, since Pickle It replaces it **(decided)**. Existing users must be able to bring their data over before that happens. How data moves is the data-architect's call (today: CSV export and import, per the 2026-11-03 storage-names decision; the open question on a one-time copy is still with the data-architect and owner).
+### 4.11 Importing Vehicle Maintenance App files
+The Vehicle Maintenance App has no users with data to move **(decided)**. So there is no copy from the old app, no notice period and no banner or final update in the old app **(decided)**. Pickle It launches on the same GitHub Pages address for now, and the owner deletes the old app once Pickle It v1 is ready **(decided)**. Importing the old app's CSV files stays, since it already works **(decided)**.
 
 Stories:
-- As a Vehicle Maintenance App user, I can move all my vehicles, schedules, shops, fill-ups and service history into Pickle It, and see that nothing was lost.
-- As a Vehicle Maintenance App user, I'm told in the old app, well before it goes away, that I need to move and how.
-- As a Vehicle Maintenance App user who moves late, a file I exported from the old app still imports after the old app is gone.
+- As someone with a Vehicle Maintenance App CSV file, I can import it and see my vehicles, schedules, shops, fill-ups and service history.
 
 Acceptance criteria:
-1. Before the Vehicle Maintenance App is deleted, Pickle It v1 is live and offers a working way to bring over all old-app data: vehicles, schedules (every / remind miles), shops, fill-ups and maintenance history.
-2. After moving, every vehicle shows the same MPG, the same due mileage per task and the same history as in the old app.
-3. The move needs no account, server or internet connection beyond loading the apps.
-4. Moving twice (or moving, then importing the same file again with Merge) doesn't duplicate anything.
-5. Pickle It never changes or deletes the old app's data; any copy is started by the user.
-6. Onboarding (4.7 AC 4) and Settings > App settings both offer the way in.
-7. Before deletion, the old app shows its users a notice saying it's being replaced, where Pickle It is, and the steps to move. The notice period is D16. Copy from release-manager.
-8. Pickle It keeps importing Vehicle Maintenance App files (no `format_version` column) indefinitely, after the old app is gone.
-9. Data that existed under the old app's earlier name (Fill-Up Receipts) is covered as data-model 4.1 says.
+1. Import accepts a Vehicle Maintenance App CSV (no `format_version` column) and brings over vehicles, schedules (every / remind miles), shops, fill-ups and maintenance history.
+2. After importing, every vehicle shows the same MPG, the same due mileage per task and the same history as in the old app.
+3. Importing the same file again with Merge doesn't duplicate anything.
+4. Pickle It never reads, changes or deletes the old app's stored data; only files the user picks are imported.
+5. Onboarding (4.7 AC 4) and Settings > App settings both offer import.
+6. Pickle It keeps importing Vehicle Maintenance App files indefinitely, after the old app is gone.
 
 ## 5. Needs a decision
 
-Decided and removed from this list on 2026-11-03: Health scope, Finance scope, Settings placement, several homes and people, combined measures, mileage and hours date estimates, small engines as things, hiding jars, units, box boundaries. Earlier numbers D1-D10 are retired; new items start at D11.
+Decided and removed from this list on 2026-11-03: Health scope, Finance scope, Settings placement and layout (Option C), several homes and people, combined measures, mileage and hours date estimates, small engines as things, hiding jars, units, box boundaries, and in Phase 2: D11 meter due text, D12 appliances, D13 Finance things, D14 number warning, D15 type DELETE, and D16 (dropped: no old-app users, so no notice period).
 
-**D11. Due text when a meter task can't show "<remaining> / <date>"** (4.2a ACs 8-11).
-- A. As proposed: remaining only when there's no estimate ("1,200 mi"), "300 mi over / Overdue", "150 mi / Today" when the estimate has passed, "Add a reading" with no reading. *(Recommended)*
-- B. Show a placeholder date ("1,200 mi / no date yet").
-- C. Hide meter tasks from the Pantry until a date can be estimated.
-
-Recommendation: A. It always shows what the user can act on, the format stays short at 320 px, and C would hide real due tasks.
-
-**D12. Appliances: own thing or tasks on a home?** The decisions name appliances in Assets; small engines are already their own things.
-- A. An appliance can be its own thing in Home (e.g. "Furnace", "Fridge"), like small engines, but the starter library puts appliance tasks on the home by default. *(Recommended)*
-- B. Appliances are always tasks on a home.
-- C. Every appliance is always its own thing.
-
-Recommendation: A. Simple homes stay one list; people who want "everything about the furnace" in one place can split it out. No new model work: it's just a thing without hours.
-
-**D13. Finance things.** What a "thing" is in Finance.
-- A. Households or accounts the user names, default "Household". *(Recommended)*
-- B. One implicit thing per jar; only tasks.
-
-Recommendation: A. Matches Health's people and Home's homes, and covers a rental property's deadlines separately. Names only, never numbers.
-
-**D14. Soft warning on number-like Health and Finance text** (4.6 AC 11). Privacy review recommends it.
-- A. Yes, in v1. *(Recommended, cuttable)*
-- B. Later.
-
-Recommendation: A. Cheap, local, and catches the worst mistake (an account number in a plain-text backup). Cut first if v1 runs long.
-
-**D15. Second confirmation for Delete all data** (4.10 AC 12b).
-- A. Type DELETE to enable the final button. *(Recommended)*
-- B. A second "Are you sure?" dialog with the destructive button in a different place.
-- C. Press and hold for 3 seconds.
-
-Recommendation: A. Hard to do by accident, works with screen readers and keyboards; C is awkward for some motor disabilities.
-
-**D16. Notice period before the Vehicle Maintenance App is deleted** (4.11 AC 7).
-- A. At least 60 days of in-app notice after Pickle It v1 is live. *(Recommended)*
-- B. 30 days.
-- C. Delete as soon as Pickle It v1 is live.
-
-Recommendation: A. Users who open the app rarely (once per oil change) need time to see the notice. Release-manager and data-architect should confirm with their plans.
-
-**Settings layout** (open, not this spec's): pick from the ux-designer's three mockups in docs/design/.
-
-Also depends on work owned by others: the lawyer engagement (name, privacy policy, terms) **(decided)**, and the data-architect's migration mechanism (4.11).
+Nothing in this spec is waiting on the owner. Still open elsewhere: the generator oil interval (docs/open-questions.md, maintenance-content-curator), and the lawyer engagement (name, privacy policy, terms) **(decided to happen; outcome pending)**.
 
 ## 6. Out of scope for v1
 - Pets jar **(decided: not a v1 category)**.
@@ -355,7 +312,7 @@ Also depends on work owned by others: the lawyer engagement (name, privacy polic
 - Native app stores: no Apple App Store for v1; Google Play maybe later **(decided)**.
 - A separate web address or custom domain (shared GitHub Pages address for now **(decided)**; no domain spend before the lawyer review **(decided)**).
 - Push or email notifications and calendar export. Users see due tasks when they open the app.
-- Snoozing a task (the data model's "skip this time" is cuttable to v1.1).
+- Snoozing a task to a later date. ("Skip this time" is in v1 as a quick action, 4.2 AC 11.)
 - Shared households or multiple users on one thing.
 - Photos, receipt scanning, document attachments, warranties.
 - Finance amounts and any cost tracking for non-vehicle tasks; optional amounts may follow after a privacy review **(decided)**. Fill-up cost stays as today.
@@ -371,22 +328,22 @@ Also depends on work owned by others: the lawyer engagement (name, privacy polic
 
 ## 7. What the data-architect needs to provide (not decided here)
 In docs/specs/data-model.md (being revised in parallel):
-1. Things and tasks for all four jars, with Health people and Finance households (D13) and no fields from the never-add list in 4.6 AC 5, enforced in the record builders, not just the forms.
+1. Things and tasks for all four jars, with Health people, Finance households and appliances as optional things, and no fields from the never-add list in 4.6 AC 5, enforced in the record builders, not just the forms.
 2. Hours of use as a measure, with readings, remind window, small engines as their own things **(decided)**, and an estimated date from hours per day between readings **(decided)**. The current draft's "no hours estimate" proposal (its decision 4) is superseded.
 3. Fixed recurring dates, including every-N-weeks from a start date, alongside "from last done".
 4. Combined measures limited to miles + time and hours + time **(decided)**, with "whichever first" due logic.
-5. One due-date function across all measures returning due date (actual or estimated), whether it's estimated, overdue flag, and miles or hours left, so the Pantry and 4.2a format everything the same way. Its result must cover each case in 4.2a ACs 8-11.
-6. The miles-per-day and hours-per-day estimates and when there isn't enough data; the "not sure" rule in 4.3 AC 7.
+5. One due-date function across all measures returning due date (actual or estimated), whether it's estimated, overdue flag, and miles or hours left, so the Pantry and 4.2a format everything the same way. Its result must cover each case in 4.2a ACs 9-12.
+6. The miles-per-day and hours-per-day estimates (only when the latest reading is under 90 days old and two readings are 30+ days apart **(decided)**); the "not sure" rule in 4.3 AC 7.
 7. CSV covering all jars with `format_version` on every row, still reading Vehicle Maintenance App files, round-trip identical.
 8. Local-only storage shaped so a later cloud option is a migration, not a rewrite. Storage for jar visibility, onboarding-complete flag and box collapse state.
-9. Delete all data (4.10 AC 12d): exactly which stores and `pickle-it:` keys are cleared, leaving any other app's data on the shared address alone.
-10. The way Vehicle Maintenance App users move before that app is deleted (4.11), and an answer to the open question about a one-time copy.
+9. Delete all data (4.10 AC 12d): delete the whole `pickle-it` database in one step and remove every `pickle-it:` localStorage key **(decided)**, leaving any other app's data on the shared address alone.
+10. Keep importing Vehicle Maintenance App CSV files (4.11). No one-time copy from the old app **(decided)**.
 
 ## 8. Edge cases to cover in design and test
-- A vehicle with no fill-ups or odometer readings, or a machine with one hour reading (no estimate: 4.2a AC 8).
-- Two readings on the same day, or a second reading equal to the first (no rate).
-- A very high rate from a short window giving an estimated date of today; a very low rate giving a date years away (year shown, 4.2a AC 4).
-- An estimated date that passes before the user enters a new reading (4.2a AC 10).
+- A vehicle with no fill-ups or odometer readings ("Add a reading"), or a machine with one hour reading (no estimate: 4.2a AC 9).
+- Two readings on the same day, readings under 30 days apart, a second reading equal to the first, or a latest reading 90+ days old (no estimate).
+- A very high rate giving an estimated date of today; a very low rate giving a date years away (year shown, 4.2a AC 5).
+- An estimated date that passes before the user enters a new reading ("Due now", 4.2a AC 11).
 - An hour reading entered lower than the last one (meter replaced or typo).
 - A "from last done" task last done long ago: overdue by many cycles shows once.
 - A fixed-date task done early, late, or skipped for several cycles.
@@ -396,22 +353,21 @@ In docs/specs/data-model.md (being revised in parallel):
 - Deleting a thing (in Assets) with tasks currently in the Pantry.
 - Hiding a jar that has overdue tasks: they leave the Pantry and the user is told first (4.10 AC 7); trying to hide the last visible jar.
 - Importing a backup that duplicates a thing or task; importing the same Vehicle Maintenance App file twice.
-- Delete all data with the app open in two tabs; while offline; cancelled at each step; then importing a backup straight after.
-- Delete all data on the shared address: the Vehicle Maintenance App's data must still be there afterwards.
-- A user who never moved their data when the Vehicle Maintenance App is deleted.
-- Very long thing and task names at 320 px, with five tabs, and long due text ("12,345 mi / Jan 4, 2027").
+- Delete all data with the app open in two tabs; while offline; cancelled at each step; typing "delete" or "Delete" (accepted) or "DELET" (not); then importing a backup straight after.
+- Delete all data on the shared address: any other app's data must still be there afterwards.
+- Very long thing and task names at 320 px, with five tabs, and long due text ("12,345 mi / Jun 3, 2027", "1,204.5 hr over").
+- Undo pressed just before the 8 seconds run out; another row opened while Undo shows.
 - Red dot and due badge contrast in every palette, light and dark (7 x 2 combinations), and the destructive Delete control in each.
 - Sensitive words in task names (Health, Finance) shown on the Pantry.
-- Numbers in Health/Finance notes: a phone number, a date written as digits, a real card number (D14 must not nag on ordinary text).
+- Numbers in Health/Finance notes: a phone number, a date written as digits, a real card number (the 4.6 AC 11 warning must not nag on ordinary text).
 
 ## 9. Could be cut if v1 runs long
-In order: D14 number warning, marking done from the Pantry (do it in the jar), Health / Finance starter libraries (custom tasks only), rotating empty-state lines (use one), "Export a backup first" shortcut in Delete all data (keep the two confirmations). The owner's 2026-11-03 decisions (combined measures, hiding jars, several homes and people, hours estimates, Health and Finance jars, two-step delete) are not on this list.
+In order (the owner decides any cut): number-like text warning (4.6 AC 11), marking done from the Pantry (do it in the jar), Health / Finance starter libraries (custom tasks only), rotating empty-state lines (use one), "Export a backup first" shortcut in Delete all data (keep the two confirmations). The owner's 2026-11-03 decisions (combined measures, hiding jars, several homes and people, hours estimates, Health and Finance jars, two-step delete) are not on this list.
 
 ## 10. Risks
 - Four jars plus Pantry on a 320 px tab bar is tight, and "<miles> / <date>" due text adds width to every row; the ux-designer should check both early.
-- Hours estimates from sparse, seasonal readings can mislead (e.g. a mower date predicted in winter). The decision stands; pairing hours tasks with a time limit (4.8 AC 3) and D11's no-estimate rule soften it. The data-model draft still proposes no hours estimate and needs updating to the decision.
+- Hours estimates from sparse, seasonal readings can mislead (e.g. a mower date predicted in winter). The decision stands; pairing hours tasks with a time limit (4.8 AC 3) and the 90-day / 30-day estimate rule (4.2a AC 3) soften it.
 - Without an "about" label, users may read an estimated date as firm. The screen-reader text says "estimated"; help copy should explain it once.
 - Health and Finance task names and notes in a plain-text CSV backup are more sensitive than car data; the warning and hints reduce but don't remove this.
-- Sharing one web address with the Vehicle Maintenance App means a script bug in either app could expose both apps' data, and a careless "delete all" or cache cleanup could hit the other app (4.10 AC 12d guards this).
-- Deleting the Vehicle Maintenance App strands anyone who hasn't moved yet; their old data may sit in the browser with no app to export it. 4.11 and D16 reduce this; the data-architect's open question is the fallback.
+- Sharing one web address with the Vehicle Maintenance App (until the owner deletes it) means a script bug in either app could expose both apps' data, and a careless "delete all" or cache cleanup could hit the other app (4.10 AC 12d guards this).
 - Seasonal and fixed dates assume the Northern Hemisphere.
