@@ -1,6 +1,6 @@
 # Finance starter library (draft for review)
 
-Status: draft, 2026-11-03. Not yet a data file.
+Status: draft, updated 2026-11-03 with the owner's Phase 2 decisions (docs/decisions.md). Not yet a data file.
 
 > **Sources checked 2026-11-03:** 4 citations opened. 2 confirmed (FTC credit reports, with wording corrected; HealthCare.gov open enrollment), 2 replaced (the IRS estimated-taxes and filing pages don't list the dates). No unsupported dates. The 6-month auto policy term stays **(unsure)**; it comes from the user's policy, not a default.
 
@@ -8,6 +8,7 @@ Status: draft, 2026-11-03. Not yet a data file.
 - **Money deadlines only, no amounts.** Tasks are names and dates. No amounts, account numbers or passwords.
 - **Not financial or tax advice.** The app should show, in the Finance setup screen: "These are date reminders, not financial or tax advice. Dates shown are common US deadlines; check your own bills, policies and the IRS for yours."
 - **US-specific.** Tax dates are US federal. State taxes, property taxes and enrollment periods vary.
+- **Things** (decided): finance things are households or named accounts; starter tasks sit on a thing named "Household" by default.
 - Vehicle registration lives in Vehicles, not here.
 - Schedules use only `time` rules.
 - **(unsure)** marks anything I couldn't confirm from a reputable source.
@@ -16,20 +17,20 @@ Status: draft, 2026-11-03. Not yet a data file.
 
 ### 1-4. Estimated tax payment (Q1, Q2, Q3, Q4)
 - Why: people with self-employment or other income without withholding pay federal tax quarterly; missing a date can mean a penalty.
-- Schedule: four separate tasks, each `time {n: 1, unit: year, from: calendar}`:
-  - "Estimated tax: Q1", proposed **Apr 15**
-  - "Estimated tax: Q2", proposed **Jun 15**
-  - "Estimated tax: Q3", proposed **Sep 15**
-  - "Estimated tax: Q4", proposed **Jan 15**
+- Schedule (decided: four yearly tasks), each `time {n: 1, unit: year, from: calendar}`:
+  - "Estimated tax: Q1", **Apr 15**
+  - "Estimated tax: Q2", **Jun 15**
+  - "Estimated tax: Q3", **Sep 15**
+  - "Estimated tax: Q4", **Jan 15**
 - DIY or pro: either (yourself or a tax preparer)
 - Source: IRS, payment periods and due dates (Apr 15, Jun 15, Sep 15, Jan 15 of the next year), and the next-business-day rule: https://www.irs.gov/faqs/estimated-tax/individuals/individuals-2
-- Why four tasks, not one: the gaps are uneven (2, 3, 4 and 3 months), so one repeating rule can't hit all four dates. **For data-architect:** confirm this is the intended way, or consider a "list of yearly dates" rule later.
-- Caveat: when a date falls on a weekend or legal holiday, the IRS moves it to the next business day (for example Jan 15, 2028 is a Saturday). The app's fixed dates won't shift; the setup note should say so **(known gap)**.
+- Why four tasks, not one: the gaps are uneven (2, 3, 4 and 3 months), so one repeating rule can't hit all four dates.
+- Note shown with these tasks: "The IRS may move a date, for example to the next business day when it falls on a weekend or holiday. Check irs.gov each year." (Jan 15, 2028 is a Saturday.) The app's fixed dates don't shift on their own.
 - Offer unchecked by default; most W-2 employees don't pay estimated tax.
 
 ### 5. File tax return
 - Why: the federal filing deadline; filing late can mean penalties.
-- Schedule: `time {n: 1, unit: year, from: calendar}`, proposed **Apr 15**
+- Schedule: `time {n: 1, unit: year, from: calendar}`, **Apr 15**
 - DIY or pro: either
 - Source: IRS, calendar-year filers file by April 15; if the 15th is a Saturday, Sunday or legal holiday, the due date moves to the next business day: https://www.irs.gov/filing/individuals/when-to-file
 - Regional: some states have different filing dates; disaster areas sometimes get IRS extensions.
@@ -58,7 +59,7 @@ Count: 8 tasks (counting the four quarterly tax tasks separately). The v1-scope 
 
 ## Optional (offer unchecked; regional)
 - **Property tax due:** `time {n: 1, unit: year, from: calendar}` or `n: 6, unit: month` for areas billed twice a year. Dates are set by the county or town; no default date is safe. Source: your local tax collector. Renters skip it. Many homeowners pay through their mortgage escrow and don't need it.
-- **Health insurance open enrollment:** `time {n: 1, unit: year, from: calendar}`, proposed **Nov 1**. HealthCare.gov open enrollment starts Nov 1 and ends Jan 15, with Dec 15 the deadline for coverage from Jan 1 (confirmed for 2027 coverage). Some state marketplaces set their own dates (my note; this page doesn't say): https://www.healthcare.gov/blog/mark-open-enrollment-dates-on-your-calendar. Employer plans and Medicare have their own windows **(unsure: varies by plan)**.
+- **Health insurance open enrollment:** `time {n: 1, unit: year, from: calendar}`, **Nov 1**. HealthCare.gov open enrollment starts Nov 1 and ends Jan 15, with Dec 15 the deadline for coverage from Jan 1 (confirmed for 2027 coverage). Some state marketplaces set their own dates (my note; this page doesn't say): https://www.healthcare.gov/blog/mark-open-enrollment-dates-on-your-calendar. Employer plans and Medicare have their own windows **(unsure: varies by plan)**.
 
 ## Left out on purpose
 - Anything with amounts (bills, budgets, balances): out of v1 per the decision.

@@ -1,8 +1,8 @@
 # Vehicles starter library (draft for review)
 
-Status: draft, 2026-11-03. Not yet in `data.js`. The data-file version waits until docs/specs/data-model.md is approved.
+Status: draft, updated 2026-11-03 with the owner's Phase 2 decisions (docs/decisions.md). Not yet in `data.js`. The data-file version waits until docs/specs/data-model.md is approved.
 
-> **Sources checked 2026-11-03:** 6 cited links opened. 1 confirmed (AAA, with wording corrected), 5 replaced (2 NHTSA pages blocked automated access (HTTP 403) so couldn't be checked, 1 USTMA page didn't give the interval, Counterman blocked access (HTTP 403), Tuffy is gone (HTTP 404)). 11 numbers have no reputable source and are marked **(no source found)**: oil 5,000 mi and 6 months, cabin filter 1 year, engine air filter 30,000 mi, brake fluid 30,000 mi and 2 years, transmission fluid 60,000 mi, spark plugs 60,000 mi, coolant 100,000 mi, battery check 6 months.
+> **Sources checked 2026-11-03:** 6 cited links opened. 1 confirmed (AAA, with wording corrected), 5 replaced (2 NHTSA pages blocked automated access (HTTP 403) so couldn't be checked, 1 USTMA page didn't give the interval, Counterman blocked access (HTTP 403), Tuffy is gone (HTTP 404)). 10 numbers have no reputable source and are marked **(no source found)**: oil 5,000 mi and 6 months, cabin filter 1 year, engine air filter 30,000 mi, brake fluid 30,000 mi and 2 years, transmission fluid 60,000 mi, spark plugs 60,000 mi, coolant 100,000 mi. Decided: they stay as editable defaults, marked.
 
 ## How to read this
 - **Schedule** uses the data-model's terms (docs/specs/data-model.md 2.3, 3.2-3.4):
@@ -10,11 +10,11 @@ Status: draft, 2026-11-03. Not yet in `data.js`. The data-file version waits unt
   - `time {n, unit, from}`: `from: done` restarts when done; `from: calendar` stays on fixed dates.
   - Two rules on one task mean "whichever comes first" (only miles + time or hours + time are allowed).
 - **Every interval is a starting suggestion.** The app should show, once per vehicle: "These are general defaults. Your owner's manual has the right schedule for your car. Edit any task to match it." Manufacturers differ a lot (for example, many newer cars list oil changes at 7,500-10,000 miles with synthetic oil, and spark plugs at 100,000 miles).
-- **(no source found)** marks a number no reputable source I could open supports. Those are marked defaults for the owner to accept, change or drop.
+- **(no source found)** marks a number no reputable source I could open supports. Decided: these stay as editable defaults, shown as marked.
 - Mileage values for items 1-8 are today's `STANDARD_SCHEDULE` (unchanged), so existing users see no surprise. Time limits are new (allowed by the "miles + time" decision).
-- Season: none of these are seasonal by default. Vehicle tasks run from last done.
+- Season: only the battery check is seasonal (a fixed fall date). Every other vehicle task runs from last done.
 
-## Tasks (11)
+## Tasks (12)
 
 ### 1. Oil and filter change
 - Why: old oil stops protecting the engine; this is the most common cause of avoidable engine wear.
@@ -33,7 +33,7 @@ Status: draft, 2026-11-03. Not yet in `data.js`. The data-file version waits unt
 - Schedule: `time {n: 1, unit: month, from: done}`
 - DIY or pro: DIY (gauge, tires cold; use the door-jamb label, not the number on the tire)
 - Source: US Tire Manufacturers Association, check pressure at least once a month when tires are cold, and check the spare too: https://www.ustires.org/tire-care-essentials. Florida HSMV also says check pressure and the spare monthly (same card as task 2).
-- Note: this is the only monthly vehicle task. If the owner thinks it's too noisy for the Pantry, drop it or default it to paused.
+- **Starts paused** (decided). It's the only monthly vehicle task, so it stays out of the Pantry until the user turns it on.
 
 ### 4. Cabin air filter
 - Why: keeps dust and pollen out of the cabin and lets the AC and defroster blow properly.
@@ -43,9 +43,9 @@ Status: draft, 2026-11-03. Not yet in `data.js`. The data-file version waits unt
 
 ### 5. Engine air filter
 - Why: a clogged filter starves the engine of air.
-- Schedule: `miles {every: 30000, remind: 5000}`
+- Schedule (decided: 30,000 mi or 1 year, whichever comes first): `miles {every: 30000, remind: 5000}` + `time {n: 1, unit: year, from: done}`
 - DIY or pro: DIY on most cars
-- Source: owner's manual. Car Care Council, inspect at each oil change and replace annually or when it shows contamination: https://www.carcare.org/2020/11/wildfires-a-serious-concern-for-vehicles-passengers/. 30,000 miles is today's default and doesn't match that guidance **(no source found)**; dusty or unpaved roads need it sooner.
+- Source: owner's manual. Car Care Council, inspect at each oil change and replace annually or when it shows contamination: https://www.carcare.org/2020/11/wildfires-a-serious-concern-for-vehicles-passengers/. That supports the 1-year limit. 30,000 miles is today's default **(no source found)**; dusty or unpaved roads need it sooner.
 
 ### 6. Brake fluid
 - Why: brake fluid absorbs water over time, which lowers its boiling point and can corrode parts.
@@ -69,7 +69,7 @@ Status: draft, 2026-11-03. Not yet in `data.js`. The data-file version waits unt
 - Why: old coolant stops protecting against freezing, overheating and corrosion.
 - Schedule: `miles {every: 100000, remind: 5000}`
 - DIY or pro: pro
-- Source: owner's manual. Many manuals also give a time limit (often in years) for long-life coolant; I didn't add one because figures vary by make. 100,000 is my proposal **(no source found)**.
+- Source: owner's manual. Many manuals also give a time limit (often in years) for long-life coolant; I didn't add one because figures vary by make. 100,000 is a product pick **(no source found)**.
 
 ### 10. Wiper blades
 - Why: worn blades streak and smear, which matters most in rain and snow.
@@ -79,10 +79,11 @@ Status: draft, 2026-11-03. Not yet in `data.js`. The data-file version waits unt
 
 ### 11. Battery check
 - Why: batteries usually fail without warning; a quick test catches a weak one before it strands you.
-- Schedule: `time {n: 6, unit: month, from: done}` **(no source found)**
+- Schedule (decided: yearly in fall): `time {n: 1, unit: year, from: calendar}`, season "Fall"
+- Date: **Oct 1** (October is the Car Care Council's Fall Car Care Month; the exact day is a product pick)
 - DIY or pro: pro test (free at many auto parts stores and repair shops)
-- Source: AAA, batteries typically last three to five years; have it checked at every oil change or tune-up, and test it yearly after three years: https://www.aaa.com/autorepair/articles/when-to-replace-your-cars-battery. Car Care Council, test the battery every fall: https://www.carcare.org/2020/10/motorist-checklist-for-fall-car-care-month-in-october/. Neither says every six months; both point to yearly.
-- Regional: heat shortens battery life; cold exposes weak batteries. A good fall reminder in cold regions.
+- Source: AAA, batteries typically last three to five years; have it checked at every oil change or tune-up, and test it yearly after three years: https://www.aaa.com/autorepair/articles/when-to-replace-your-cars-battery. Car Care Council, test the battery every fall: https://www.carcare.org/2020/10/motorist-checklist-for-fall-car-care-month-in-october/.
+- Regional: heat shortens battery life; cold exposes weak batteries. Southern Hemisphere: shift 6 months (Apr 1).
 
 ### 12. Registration renewal
 - Why: driving on an expired registration can mean a ticket or fine.
@@ -97,7 +98,7 @@ Status: draft, 2026-11-03. Not yet in `data.js`. The data-file version waits unt
 - DIY or pro: pro (licensed inspection station)
 - Source: your state's DMV or environmental agency. Many states have no inspection; rules vary by county, vehicle age and fuel type. Offer it, unchecked by default.
 
-Count: 12 tasks plus 1 optional. The v1-scope target is 8-12. If 12 is too many, cut item 3 (monthly tire check) or item 10 (wipers) first.
+Count: 12 tasks plus 1 optional (decided: keep all 12; task 3 starts paused). The v1-scope target is 8-12.
 
 ## Not included (and why)
 - Brake pad inspection: important, but I found no reputable interval to cite; shops usually check it at tire rotation. Candidate for later.
