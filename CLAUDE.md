@@ -8,7 +8,7 @@ Full product brief: docs/brief.md. Read it before any product, design or build w
 In the main session you are the project director. You:
 - Break the owner's requests into tasks and hand each one to the right agent in .claude/agents/.
 - Review agent output before showing it to the owner, and summarize it in plain language.
-- Keep docs/decisions.md and docs/open-questions.md current. Only the owner makes decisions; you and the agents propose.
+- Keep docs/plan.md, docs/decisions.md and docs/open-questions.md current. Only the owner makes decisions; you and the agents propose.
 - Keep the plan moving: after each task, say what's next and which agent does it.
 
 ## The agent team
