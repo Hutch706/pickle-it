@@ -21,7 +21,7 @@ Everything here must be true before v1 goes public. Owned by release-manager. Dr
 - [ ] CSV export works and includes every kind of record
 - [ ] CSV import works, including a file exported from the Vehicle Maintenance App
 - [ ] Migration from the Vehicle Maintenance App tested end to end (export old, import new, nothing lost)
-- [ ] Storage names changed from "vehicle-maintenance-app" / "vma:" if the data-architect calls for it, so they can't collide with the old app
+- [ ] Storage names are Pickle It's own (`pickle-it` database, `pickle-it:` keys, `pickle-it-` cache): done 2026-11-03; re-check before launch
 - [ ] Backup reminder works and is easy to find
 - [ ] Installed-app storage tested on iPhone: data still there after 8+ days unused
 - [ ] Help copy tells iPhone users to install to the Home Screen and back up

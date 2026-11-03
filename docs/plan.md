@@ -11,12 +11,13 @@ Kept by the director. Each task: status, agent, output. Newest phase at the bott
 - [x] Storage recommendation, data model, migration plan draft: docs/specs/data-model.md (data-architect)
 - [x] Distribution and name check draft: docs/release/distribution.md, checklist.md (release-manager)
 - [x] Privacy review: docs/reviews/privacy-security-2026-11-03.md (privacy-security-reviewer)
-- [ ] Reconcile with branch claude/pickle-it-repo-setup-a40c79, which logged owner decisions on 2026-11-03 that these drafts didn't see (director, after owner's call)
-- [ ] Owner decides the remaining Phase 1 questions
+- [x] Rebase onto claude/pickle-it-repo-setup-a40c79 and revise v1-scope.md and data-model.md to the logged decisions (director, product-spec-writer, data-architect)
+- [ ] Privacy re-review with Health and Finance in scope (privacy-security-reviewer)
+- [ ] Owner decides the "Ready to decide" list in docs/open-questions.md
 
 ## Phase 2: Design
-- [ ] Design system, tab bar, Pantry home, onboarding, empty states (ux-designer)
-- [ ] Starter task libraries for vehicles and home (maintenance-content-curator)
+- [ ] Design system, tab bar (Pantry + 4 jars, check at 320 px), Pantry home, Settings, onboarding, empty states (ux-designer)
+- [ ] Starter task libraries for Vehicles, Home, Health, Finance, with season dates and hours + time pairs (maintenance-content-curator; after Health/Finance scope is decided)
 
 ## Phase 3: Build, test, release
 Follows "How work flows" in CLAUDE.md, one screen at a time.

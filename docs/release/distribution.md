@@ -57,7 +57,7 @@ This depends on the open "Data storage" question. If Pickle It adds accounts and
 
 **Rule: the existing Vehicle Maintenance App deployment stays untouched.** Pickle It gets its own new address. Don't rename, move or redirect the old repository or its GitHub Pages site. Its users' data is tied to that address.
 
-**The Pickle It launch address must be permanent.** Data is tied to the exact origin (scheme + host + port). A GitHub Pages project site lives at `https://USER.github.io/REPO/`. Every project site on that account shares the origin `USER.github.io`, so it shares storage limits with the Vehicle Maintenance App. Pickle It uses a different IndexedDB name only if the data-architect changes it (today it's still "vehicle-maintenance-app", the same name as the old app). On the same origin, the two apps would collide on IndexedDB and on `vma:` localStorage keys. **So do not host Pickle It on the same `USER.github.io` origin as the old app unless the storage names are changed first.** A custom domain or a separate host avoids this entirely.
+**The Pickle It launch address must be permanent.** Data is tied to the exact origin (scheme + host + port). A GitHub Pages project site lives at `https://USER.github.io/REPO/`. Every project site on that account shares the origin `USER.github.io`, so it shares storage limits with the Vehicle Maintenance App. Pickle It now uses its own storage names (`pickle-it` database, `pickle-it:` keys), so the two apps no longer collide on data, but they would still share the origin's storage quota and site-data clearing. A custom domain or a separate host avoids this entirely.
 
 | Option | Cost | Address | Notes |
 |---|---|---|---|
