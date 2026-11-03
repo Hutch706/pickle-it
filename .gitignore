@@ -1,3 +1,9 @@
 css-guide/04-maintenance-section.png
 Claude outputs/palette-options.html
 *.png
+node_modules/
+dist/
+.DS_Store
+.env
+.env.*
+*.log
