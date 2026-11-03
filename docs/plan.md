@@ -12,7 +12,8 @@ Kept by the director. Each task: status, agent, output. Newest phase at the bott
 - [x] Distribution and name check draft: docs/release/distribution.md, checklist.md (release-manager)
 - [x] Privacy review: docs/reviews/privacy-security-2026-11-03.md (privacy-security-reviewer)
 - [x] Rebase onto claude/pickle-it-repo-setup-a40c79 and revise v1-scope.md and data-model.md to the logged decisions (director, product-spec-writer, data-architect)
-- [ ] Privacy re-review with Health and Finance in scope (privacy-security-reviewer)
+- [x] Privacy re-review with Health and Finance in scope (privacy-security-reviewer)
+- [ ] After owner decisions: fold privacy guidance into v1-scope 4.6 (product-spec-writer); per-jar shop list and v2 import checks (data-architect); draft privacy policy and terms for the lawyer (release-manager)
 - [ ] Owner decides the "Ready to decide" list in docs/open-questions.md
 
 ## Phase 2: Design

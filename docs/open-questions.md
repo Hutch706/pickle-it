@@ -16,6 +16,8 @@ Each needs an owner decision. Once decided, move it to docs/decisions.md.
 - **Several homes / people.** Recommended: yes. v1-scope.md D4.
 - **Hiding jars a user doesn't need.** Recommended: yes, cuttable. v1-scope.md D8.
 - **Units.** Recommended: miles and gallons for v1. v1-scope.md D9.
+- **Discreet Pantry rows (Health/Finance).** Recommended: rely on hiding jars plus discreet task names in v1; add a per-jar "hide names" setting in v1.1. Details: docs/reviews/privacy-security-2026-11-03.md.
+- **Export with Health/Finance.** Recommended: one full backup with a plain warning that it isn't encrypted; no per-jar export checkbox for now. Details: privacy review.
 - **Season dates.** Recommended: the content curator picks per task, with fixed season starts as a fallback. data-model.md.
 
 ## Later

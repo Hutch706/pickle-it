@@ -1,134 +1,208 @@
-# Privacy and security review: Phase 1 drafts and imported code
+# Privacy and security review: Phase 1 drafts and current code
 
-Reviewer: privacy-security-reviewer, 2026-11-03. Status: review of **unapproved drafts**. Nothing here is decided; the owner decides.
+Reviewer: privacy-security-reviewer, 2026-11-03. **Revised 2026-11-03 (second pass)** against the current branch and the revised drafts. The first pass reviewed an older commit (8344403) with the Vehicle Maintenance App's storage names and assumed Health and Finance were out of v1. What changed in this pass:
+- B1 (shared storage names) is **closed**: verified fixed in code. The remaining shared-origin risk is now M1.
+- Storage is **decided** (local-only, with a path to cloud later), so the storage comparison is gone and "Needs a decision" no longer asks about it. Section 4 covers what changes if cloud comes later.
+- The DM Sans finding (old M3) is **moot**: the look follows app.css, which loads no web font.
+- New section 2 on **Health and Finance** (now v1 jars) and the new **hours-of-use readings**.
+- "Delete all my data" moved up from Minor to Major because the app will now hold health and money reminders.
+- The privacy policy and terms outline (section 5) is updated for all of the above.
 
-Read: CLAUDE.md, docs/brief.md, docs/decisions.md, docs/open-questions.md, docs/specs/data-model.md, docs/specs/v1-scope.md, docs/release/distribution.md, docs/release/checklist.md, and (read-only) index.html, app.js, data.js, app.css, sw.js, manifest.webmanifest, README.md, install-steps.md, .gitignore, and the git history of this branch.
+Status: review of **unapproved drafts** (docs/specs/v1-scope.md, docs/specs/data-model.md, both revised 2026-11-03). Only the owner decides.
 
-Code reviewed is this branch (`claude/subagents-project-8ff5a6`, commit 8344403), which still has the imported Vehicle Maintenance App code unchanged. Another local branch (`claude/pickle-it-repo-setup-a40c79`) has commits named "Give Pickle It its own storage names" and "Rename to Pickle It". I did not review that branch; some findings below may already be fixed there.
+Read: CLAUDE.md, docs/decisions.md (source of truth), docs/brief.md, docs/open-questions.md, docs/specs/v1-scope.md, docs/specs/data-model.md, docs/release/distribution.md, and (read-only) index.html, app.js, data.js, app.css, sw.js, manifest.webmanifest, and the tracked file list. Code reviewed: branch `claude/subagents-project-8ff5a6`, commit f72d868.
 
 This is not legal advice. Items marked **Lawyer** need a qualified lawyer's review before launch.
 
 ---
 
-## 1. Storage options compared
+## 1. What personal data the app handles
 
-### What personal data the app handles (all options)
-| Data | Where it comes from | Why it's sensitive |
+Storage is decided: **local-only** in the user's browser (IndexedDB `pickle-it`, localStorage `pickle-it:` keys, an offline cache), no accounts, no server. The owner never receives user data. The host (GitHub or Cloudflare) sees normal request logs: IP address, browser, time, page requested.
+
+| Data | Jar | Why it's sensitive |
 |---|---|---|
-| Vehicle names ("2019 Civic", sometimes a plate or VIN typed in) | User | Can identify a person or vehicle |
-| Fill-ups: date, odometer, gallons, price, **station name** | User | Date + station = where someone was and when; repeated stations reveal routines and home/work area |
-| Maintenance log: date, odometer, shop, item, **free-text notes** (up to 2,000 chars) | User | Notes can hold anything: VIN, address, gate code, phone numbers |
-| Home items and dates (v1, planned) | User | What someone owns, where, and when they're likely away (e.g. "winterize cabin") |
-| Shops list | User | Local businesses used, approximate location |
-| Settings: last export date, change count, theme, hemisphere (planned) | App | Low |
+| Thing names: vehicles ("2019 Civic", sometimes a plate or VIN), homes ("Lake cabin"), **people** ("Me", "Sam", "Dad"), households or accounts ("Rental", "Chase card") | All | People's names are personal data about family members who never used the app. Account names hint at banks and lenders. |
+| Fill-ups: date, odometer, gallons, price, **station name** | Vehicles | Date + station = where someone was and when; repeated stations reveal routines and home/work area |
+| Task names and due dates | All | Home: what someone owns and when they're away ("Winterize cabin"). **Health: conditions and treatments** ("Insulin refill", "Oncology follow-up", "Therapy"). **Finance: debts and income patterns** ("Payday loan due", "Quarterly estimated tax" implies self-employment). |
+| Done logs: date, odometer or hours, **shop/provider**, **free-text notes** (up to 2,000 chars), done or skipped | All | Provider names in Health (a fertility clinic, a psychiatrist) are health data on their own. Notes can hold anything: VINs, gate codes, results, account numbers. Skipped logs show missed medical care or missed payments. |
+| **Hour-meter readings** (new `readings` store): thing, date, hours | Home, any | Low on their own. A generator's readings with dates hint at power outages and when someone was home; boat or outboard hours show leisure patterns. |
+| Shops list (`settings.shops`) | Shared by all jars | See finding M5: one list, so health providers show up as suggestions in the vehicle form |
+| Settings: last export, change count, hemisphere, onboarding done, jar visibility; theme, palette, box collapse state | App | Low. Hidden jars (D8) reveal nothing; they keep their data. |
 
-The app does **not** collect: name, email, phone, precise GPS location, contacts, photos, device IDs, analytics or ad identifiers. Keep it that way. Hemisphere is user-chosen (data-model 5.7), which is the right call: never request the location permission to set it.
-
-### Comparison
-| | A: device only | B: accounts + cloud sync | C: user's own iCloud / Google Drive |
-|---|---|---|---|
-| **What the owner holds** | Nothing. The owner never receives user data. The host (GitHub or Cloudflare) sees standard request logs: IP address, user agent, time, page requested. | Everything above for every user, plus email addresses, sign-in records, server logs and backups. The owner becomes the controller of a database of where people buy fuel and what they own. | Two variants. **C1 manual** (share sheet to Files/Drive, which the export already does on phones): owner holds nothing, same as A. **C2 automatic** (app calls the Google Drive API or CloudKit JS): owner still holds no records, but registers an OAuth app and the user grants it access to their drive. |
-| **Legal obligations that kick in** | Light. A privacy policy is still needed (both app stores require one; good practice for the PWA). Saving data on the user's own device to provide the feature they asked for is the "strictly necessary" case under EU/UK cookie rules, so no consent banner is needed as long as there are no analytics or third-party requests. **Lawyer** to confirm. | Heavy. GDPR/UK GDPR controller duties if anyone in the EU/UK uses it (lawful basis, access/export/deletion requests, records of processing, a data processing agreement with Supabase/Firebase, international transfer terms, breach notice to the regulator within 72 hours). US state breach-notification laws (every state has one). State privacy laws (California etc.) mostly have revenue or user-count thresholds a free app won't hit, but **Lawyer** to confirm. App stores require in-app account deletion (Apple guideline 5.1.1(v); Google Play's account deletion policy) and a "data collected" disclosure. Children: must say the app isn't for under-13s, and act if one signs up (COPPA). | C1: same as A. C2: Google's API Services User Data Policy and OAuth app verification (a privacy policy URL, a verified domain, a consent screen; use the narrow `drive.file` or `appDataFolder` scope, never full Drive). Apple CloudKit JS needs the $99/yr Apple Developer Program. The owner is not holding the data but is responsible for what the app does with the access token. |
-| **Breach exposure** | Smallest possible. No central store to breach. Remaining risks are per device: a script-injection bug (none found, see 2), a shared origin (finding B1), a lost unlocked phone, or a leaked backup file. | Largest. One misconfigured access rule (a classic with Supabase row-level security and Firebase rules) exposes every user's location history at once. Credential stuffing on accounts. Requires security monitoring the owner would have to run. | C1: same as A. C2: a compromised or malicious app version could read/write the user's synced backup file, and the OAuth client becomes a target. Exposure is per user, not all users at once. |
-| **Running cost / effort** | $0, done | Paid tier likely, weeks of work, breaks "no dependencies" | C1: $0, exists today. C2: weeks, OAuth setup, possibly $99/yr for Apple |
-
-### Recommendation
-**Back Option A for v1**, the same as the data-architect, with C1 (share-sheet backup to the user's own cloud drive) described in the app as the way to keep a copy safe. It holds no user data, keeps the legal surface small, and the honest one-line promise "Your data never leaves your device unless you export it" is a real product feature. Revisit B or C2 only after v1, and treat either as a new privacy review before any build (data-model 5.6). Health and Finance jars (v1-scope D1) would raise the bar further under B; keep them out of v1 as recommended.
+The app does **not** collect: the user's own name, email, phone, precise location, contacts, photos, device IDs, analytics or ad identifiers. Keep it that way. Hemisphere stays user-chosen (data-model 3.2, 5.8); never request the location permission. Screen names are the only thing in the URL hash (app.js:98); keep thing and task names out of the URL and `document.title`, since browser history syncs to the user's Google or Apple account.
 
 ---
 
-## 2. Findings, ranked
+## 2. Health and Finance: privacy stakes by scope option
+
+Local-only storage means none of this reaches the owner. The stakes are on the device and in the backup file: someone glancing at the phone, a shared or lost phone, a CSV emailed or left in a cloud drive, and a script-injection bug. They rise sharply if cloud sync comes later (section 4).
+
+### 2.1 Health (v1-scope D1)
+| Option | What could be exposed | Privacy view |
+|---|---|---|
+| **A. Appointments and renewals, no medical fields** | Task names, people, provider names, dates, notes. Reveals some conditions by name ("Insulin refill"), but only what the user chooses to type. | **Acceptable for v1** with the fixes below. Recommend A. |
+| B. A plus medication schedules | Medication names, doses, times, adherence (taken/missed). Clearly health data, daily, and detailed. | Not for v1. It also needs notifications, which on a PWA means a push service (a third party that sees timing and payload unless encrypted). Would need a new review. |
+| C. A plus records | Results, diagnoses, providers, documents. | Avoid. Turns a reminder app into a health-records app; much heavier legal picture even locally once cloud sync exists. |
+
+### 2.2 Finance (v1-scope D2)
+| Option | What could be exposed | Privacy view |
+|---|---|---|
+| **A. Money deadlines, no amounts** | Insurer, lender, tax and subscription names and dates. Reveals some financial situation (debts, self-employment, which bank). | **Acceptable for v1** with the fixes below. Recommend A. |
+| B. A plus amounts | Spending and income patterns, bill sizes. | Fine locally and a reasonable v1.1, but it makes the CSV more sensitive and the export warning more important. Review again before build. |
+| C. Bills and budgeting | Payees, balances, budgets, and it invites account numbers. | Avoid. Account numbers and balances are fraud material in a plain-text backup. |
+
+### 2.3 Fields to never add (any option)
+Diagnosis, condition, medication, dose, test results, insurance member or policy ID, provider phone or address, date of birth, age, sex, account number, routing number, card number, SSN or tax ID, password, PIN, security answers, balances. Also no "relationship" field on people (Health things): a first name or "Me" is enough. If a starter library ever wants age-based screenings ("colonoscopy at 45"), suggest the task without asking for a birth date.
+
+v1-scope 4.6 AC 5 already says no such fields; keep it as a hard rule in the spec and in the data-model's record builders (no field, not just no input).
+
+### 2.4 Notes and name hints
+A hint helps but isn't enough alone. Recommend all three, all cheap and local:
+1. **Per-jar placeholder text** on the notes field, visible before typing:
+   - Health: "e.g. Ask about switching to 90-day refills. Skip results and ID numbers."
+   - Finance: "e.g. Renewal notice comes by mail. Don't store account numbers or passwords."
+   - Vehicles and Home keep maintenance examples ("e.g. Replaced front brake pads").
+2. **A soft warning, not a block**, when Finance or Health notes or names contain a run of 9 or more digits or look like a card number (13-19 digits passing a Luhn check): "This looks like an account or ID number. Pickle It backups aren't encrypted. Save anyway?" Runs on the device only. Store nothing about the check.
+3. **Help copy** (release-manager): suggest discreet task names for sensitive things ("Dr. visit" instead of the condition).
+
+### 2.5 What the Pantry shows at a glance
+There are no notifications in v1, so nothing reaches the lock screen. The exposure is someone looking at the open app, or the phone's app switcher (iOS and Android show a snapshot of the last screen; a web app can't blur it).
+- v1-scope 4.6 AC 6 is right: the row shows only task name, thing name and due text. Keep notes, provider and history off the Pantry.
+- Keep jar visibility (D8): a user can hide Health or Finance entirely. That's the simplest "discreet" control, so recommend approving D8 for privacy as well as clutter.
+- Optional (owner decision 3 below): a per-jar "Show in Pantry as 'Health task'" setting that hides task and thing names on the Pantry for that jar. Cuttable to v1.1.
+- If notifications are ever added (Health option B, or the native wrappers in distribution.md), they must default to generic text ("1 thing is due") and need a new review.
+
+### 2.6 Export and backup
+The CSV will now carry health and money reminders, in plain text, and on phones it opens the share sheet (app.js:917-923), so it gets emailed, AirDropped or saved to cloud drives.
+- **Export warning (required):** one plain line by the Export button: "This file isn't encrypted. It includes everything you've saved, including Health and Finance tasks and notes. Keep it somewhere private." Show it every time, not once.
+- The file name `pickle-it-YYYY-MM-DD.csv` reveals nothing. Keep jar names out of it.
+- Optional (owner decision 4 below): "Include Health and Finance" checkbox on export, default on (a backup that silently leaves data out is a data-loss risk). Cuttable.
+- Still no password-protected backup in v1: a forgotten password loses everything, and it breaks opening the file in Excel. Revisit if Finance amounts or cloud sync arrive.
+
+### 2.7 Third parties in the data
+People in the Health jar are often family members. They didn't agree to be in the app, but the data stays on the user's device and the owner never sees it. The privacy policy should say users may enter information about others and are responsible for it. **Lawyer** to confirm wording.
+
+---
+
+## 3. Findings, ranked
 
 Severity: **Blocker** = must fix before public launch. **Major** = should fix before launch. **Minor** = fix when convenient.
 
 ### Blockers
+None open.
 
-**B1. Same-origin hosting with the old app, while the code still uses the old app's storage names.**
-On this branch, the code uses IndexedDB `vehicle-maintenance-app` (data.js:95), localStorage prefix `vma:` (app.js:20-21), BroadcastChannel `vehicle-maintenance-app` (app.js:52), cache `vehicle-maintenance-app-v1` (sw.js:5), and its activate step deletes every cache starting `vehicle-maintenance-app-` (sw.js:22-23). It also runs `moveFromOldName()` (data.js:128-146), which copies the `fillup-receipts` database and then **deletes** it, and the `fur:` key move (app.js:23-27), which deletes old keys. If Pickle It goes up on `hutch706.github.io/...`, it reads and writes the live old app's data, can delete the old app's legacy data, and will break the old app when the schema changes. That's a data-loss and data-mixing problem for real users.
-- **Fix:** Do the renames in data-model 2.1, and **add the BroadcastChannel name** (`pickle-it`), which 2.1's table leaves out; otherwise the two apps on one origin would trigger each other's reloads. Remove `moveFromOldName()` and the `fur:` move, as 2.1 says.
-- **Fix (stronger, recommended):** host Pickle It on its **own origin** (Cloudflare `pages.dev` or a custom domain), as release-manager recommends in distribution.md section 2. Renames stop accidental mixing; only a separate origin stops a script-injection bug in either app from reading the other's data (data-model 5.1). The cost is losing the same-origin direct copy (data-model 4.2); CSV import covers migration. Owner decision, see "Needs a decision".
+**B1. Same-origin storage names. CLOSED (verified 2026-11-03).** The code now uses its own names everywhere: IndexedDB `pickle-it` (data.js:96), localStorage `pickle-it:` keys (app.js:20-21, and the inline theme script in index.html:22), BroadcastChannel `pickle-it` (app.js:46), cache `pickle-it-v1` with activate cleanup limited to `pickle-it-` caches (sw.js:7, 21-26). `moveFromOldName()` and the `fur:`/`vma:` key moves are gone; no code mentions `vehicle-maintenance-app`, `vma:`, `fur:` or `fillup-receipts` (data-model 2.1 agrees). The two apps can no longer overwrite or delete each other's data by accident. What's left is the shared origin itself: M1.
 
 ### Major
 
-**M1. No Content-Security-Policy.** index.html has no CSP. The code is clean today (see M2), but a CSP is cheap insurance against a future `innerHTML` mistake, a compromised dependency, or an injected script, and it enforces the "no third-party requests" promise the privacy policy will make.
-- **Fix:** add a `<meta http-equiv="Content-Security-Policy">` to index.html, roughly: `default-src 'self'; script-src 'self' 'sha256-<hash of the inline theme script>'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'`. The inline theme script in `<head>` needs its hash (or move it into a file). GitHub Pages can't set response headers, so `frame-ancestors` (anti-framing) only works on Cloudflare Pages via a `_headers` file; another small reason to prefer Cloudflare. frontend-engineer should test that the share sheet, file picker, blob download and service worker still work with it on.
+**M1. Host on Pickle It's own origin.** (Was the "stronger fix" under B1.) On a shared `USER.github.io` origin, storage names keep the data apart, but:
+- a script-injection bug in either app can read the other's whole database, now including Health and Finance;
+- "Clear site data" for one app wipes both, and they share one storage quota and Safari's eviction (distribution.md section 2);
+- a service worker or CSP mistake in the old app affects Pickle It.
+- **Fix:** launch on its own origin: a custom domain, or Cloudflare `pages.dev` for $0, as release-manager recommends (distribution.md). Users already migrate by CSV (decided), so nothing is lost. Owner decision 2 below. Choose before the first public user: changing origin later strands everyone's data.
 
-**M2. Keep the "no innerHTML with user text" rule as the app is rebuilt.** Current state is good: every user string goes through `textContent` (the `el()` helper, app.js:6, `setMsg`, app.js:17) or `.value`. The only `innerHTML` (app.js:649) is a fixed SVG checkmark. No `eval`, `new Function`, `document.write` or `insertAdjacentHTML`. The risk is the v1 rebuild: Pantry, jars and Home screens are all new UI, and new code is where injection bugs appear.
-- **Fix:** write the rule into CLAUDE.md or the frontend-engineer brief: build DOM with `el()`/`textContent`; `innerHTML` only for fixed strings in the code; never for names, notes, stations, shops, imported text or anything from storage. qa-accessibility-tester should include an import fixture with names like `<img src=x onerror=alert(1)>` and `"><script>` and check they show as plain text everywhere (Pantry, due boxes, dialogs, `<datalist>`, chart tooltip).
+**M2. No Content-Security-Policy.** Still none in index.html. The code is clean (M3), but a CSP is cheap insurance against a future `innerHTML` slip or injected script, and it enforces the policy's "no third-party requests" promise. More valuable now that the app holds health and money reminders.
+- **Fix:** add a `<meta http-equiv="Content-Security-Policy">` roughly: `default-src 'self'; script-src 'self' 'sha256-<hash of the inline theme script>'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'`. The inline theme script (index.html:19-26) needs its hash, or move it to a file. `frame-ancestors` only works as a response header (Cloudflare Pages `_headers`; GitHub Pages can't set headers). frontend-engineer tests the share sheet, file picker, blob download and service worker with it on.
 
-**M3. Third-party font (DM Sans): self-host, don't use Google Fonts.** Today the app loads no external resources at all (fonts are system stacks, app.css:22-24), and sw.js ignores cross-origin requests (sw.js:31). The brief now asks for DM Sans.
-- Google Fonts: every app open sends the user's IP address, browser and the page address to Google. A Munich court (LG München I, 20 Jan 2022, 3 O 17493/20) held that embedding Google Fonts this way without consent broke GDPR and awarded damages, which started a wave of demand letters in Germany. It would also make "we don't send your data anywhere" false, need a consent question for EU users, and the font would fail offline because sw.js doesn't cache other origins.
-- Self-hosting: DM Sans is under the SIL Open Font License 1.1, which allows bundling. No outside request, works offline, nothing to disclose.
-- **Fix:** self-host DM Sans as `woff2` files (Latin subset, only the weights used), declared with `@font-face` and `font-display: swap` in app.css, include the OFL license text in the repo, and add the font files to `FILES` in sw.js. Ask the owner before adding the files (they're a new asset, not code, but still worth a yes).
+**M3. Keep "no innerHTML with user text" through the rebuild.** Current state is good: user strings go through `textContent` (the `el()` helper, `setMsg`) or `.value`; the only `innerHTML` (app.js:643) is a fixed SVG checkmark; no `eval`, `new Function`, `document.write` or `insertAdjacentHTML`. The Pantry, four jars, onboarding and Settings are all new UI, which is where injection bugs appear.
+- **Fix:** write the rule into the frontend-engineer brief: build DOM with `el()`/`textContent`; `innerHTML` only for fixed strings in code; never for thing, task, provider, shop, note, station or imported text. qa-accessibility-tester adds an import fixture with names like `<img src=x onerror=alert(1)>` and `"><script>` in every jar (including Health people and Finance households) and checks they show as plain text on the Pantry, due boxes, jar screens, dialogs, `<datalist>`, red-dot accessible names and the chart tooltip.
 
-**M4. Backups are plain text and travel.** (data-model 5.3.) The CSV holds station names with dates, notes and everything else, unencrypted. On phones the export opens the share sheet (app.js:923-930), so people email it to themselves or drop it in cloud drives and chats.
-- **Fix:** add one plain line near the Export button: "This file isn't encrypted and includes everything you've logged, like gas stations and notes. Keep it somewhere private." Don't add encryption in v1: a password-protected backup that users forget the password for is a worse data-loss risk than the privacy gain, and it breaks opening the file in Excel. Revisit if notes or receipts grow.
+**M4. Backups are plain text and travel.** Unchanged in substance, higher in stakes: see 2.6 for the warning copy. Required before launch.
 
-**M5. Free-text notes invite sensitive data.** Notes accept 2,000 characters (data.js:85) and land in the CSV. Users will type VINs, addresses, gate or alarm codes.
-- **Fix:** placeholder text that steers to maintenance ("e.g. Replaced front brake pads"; already true for "Other repairs", index.html) and no prompt that asks for VIN, plate or address. The privacy policy should say notes are stored like everything else (on the device, in the backup). Don't add a VIN field in v1 (v1-scope section 6 already rules out VIN lookup; keep it that way).
+**M5. One shop list for every jar leaks providers across jars.** data-model 2.3 keeps one `settings.shops` list for logs in every jar ("Shop, contractor, provider or 'DIY'. Same shop list in settings."). A psychiatrist or clinic added in Health would then be suggested in the Vehicles maintenance form's dropdown, which is exactly where someone else might be looking over a shoulder at the mechanic's.
+- **Fix:** keep shop suggestions per jar (store the jar with each shop, or a list per jar), or don't offer suggestions in Health and Finance at all. data-architect's call; small change if made before build.
+
+**M6. "Delete all data on this device".** (Was m4, raised.) There's still no way to wipe everything except deleting things one by one or clearing browser site data, which most people can't find, and which differs between Safari tabs and the home-screen app on iOS. With health and money reminders on the device, users need a clear, complete delete (selling or lending a phone, a family member leaving).
+- **Fix:** add it to Settings behind a confirmation that offers export first. It should clear IndexedDB stores (including `readings`), `pickle-it:` localStorage keys and the `pickle-it-` caches. It lets the privacy policy give a true, simple answer to "how do I delete my data".
 
 ### Minor
 
-**m1. Import size limit already exists; data-model 5.4 says it doesn't.** app.js:952 rejects files over 20 MB before reading them. Good. data-model.md section 5.4 says "There's no file-size limit today"; that's a factual slip to correct when the doc is approved. Keep the check in the rebuilt importer. Inside the limit, a 20 MB CSV is still around 200,000 rows; the parser is linear and records go through the builders, so the worst case is a slow preview, not a crash. Optional: cap rows (say 100,000) with a clear message.
+**m1. Import size limit. Resolved in the docs.** app.js:946 rejects files over 20 MB before reading; data-model 5.5 now says so. Keep it in the rebuilt importer. Optional: cap rows (say 100,000) with a clear message.
 
-**m2. Import is otherwise well defended.** Every row goes through `makeVehicle`/`makeItem`/`makeFillup`/`makeService` with length caps (`cleanText`, 60-120 chars; notes 2,000) and number/date range checks (data.js:54-89). Binary files are rejected (data.js:404). Nothing from the file is executed or put into HTML. A preview is shown and the user chooses Merge or Replace. Keep all of this in the v2 importer; the new columns in data-model 4.3 (`thing`, `season`, `every_unit`, `time_from`, `jar`, `status`) need the same treatment: enums checked against an allow-list (`jar` must be `vehicles` or `home`, not any string), text capped.
+**m2. Import is otherwise well defended; extend it to the new data.** Rows go through `makeVehicle`/`makeItem`/`makeFillup`/`makeService` with length caps (`cleanText`, `cleanNotes`) and range checks; binary files are rejected (data.js:376); nothing is executed or put into HTML; preview, then Merge or Replace. For version 2 (data-model 4.3):
+- `jar` against an allow-list of exactly `vehicles`, `home`, `health`, `finance`; `every_unit`, `time_from`, `status` against their own allow-lists. An unknown value rejects the row, not the file.
+- `hours`, `every_hr`, `remind_hr` and `reading` rows: finite numbers within 0-99,999.9, one decimal, decimal comma handled, no `NaN`/`Infinity`/negatives. A reading lower than the last one is kept (meter replaced) but shouldn't crash the "highest reading" math.
+- `thing` names capped at 80 chars like vehicle names; `first_due`, `for_due` through the same date parser as `date`.
+- Import must never create fields 2.3 says not to have: unknown columns stay ignored, as today.
 
-**m3. CSV formula guard misses the id columns.** The guard (data.js:273-280) prefixes `'` on `vehicle`, `station`, `shop`, `item`, `notes` when they start with `= + - @` tab or CR. That covers everything a user types. But `vehicle_id`, `item_id`, `id` and `visit` are taken from imported files (capped at 60 chars, data.js:59, 70, 87-88) and exported unguarded. A crafted file could carry `=HYPERLINK(...)` in an id column, survive an import, and run as a formula when the user's next export is opened in Excel. Low likelihood (needs someone to hand the user a crafted file), low-medium impact.
-- **Fix:** either validate imported ids to a safe pattern (e.g. `^[A-Za-z0-9_~-]{1,60}$`, else generate a new id) or add the id columns to the guard set. Validating is better: it also keeps ids clean as IndexedDB keys. Add the new v2 text columns to `CSV_TEXT` as data-model 4.3 already plans.
+**m3. CSV formula guard misses the id columns.** Still open. The guard (data.js:245-251) covers `vehicle`, `station`, `shop`, `item`, `notes`. Ids (`id`, `vehicle_id`, `item_id`, `visit`, and in version 2 `thing_id`) come from imported files and are exported unguarded, so a crafted file could carry `=HYPERLINK(...)` that runs when the user's next export is opened in Excel. Low likelihood, low-medium impact.
+- **Fix:** validate imported ids to a safe pattern (e.g. `^[A-Za-z0-9_~-]{1,60}$`, else generate a new id). Add the new text columns `thing` and `season` to `CSV_TEXT` as data-model 4.3 plans. Enum columns are safe once allow-listed (m2).
 
-**m4. No "delete all my data" button.** Users can delete vehicles one by one; wiping everything means clearing browser site data, which most people don't know how to do and which differs between Safari tabs and the home-screen app on iOS.
-- **Fix:** add "Delete all data on this device" in Settings, behind a confirmation that offers export first. Lets the privacy policy give a simple, true answer to "how do I delete my data".
+**m4. iOS Safari data eviction.** The iOS nudges (index.html:44-46, 188), the storage card, the persistent-storage request (`askPersist`, data.js:151-153) and the backup reminder all say it plainly. Carry them into the rebuild, count changes in all four jars (v1-scope 4.9 AC 6), and say in the policy and help that the owner can't recover lost data.
 
-**m5. iOS Safari data eviction.** (data-model 5.5.) Current copy is good: the iOS nudge (index.html, `iosNudge` and `iosWelcome`), the storage card (app.js:1051-1054), the persistent-storage request (data.js:183-184) and the backup reminder all say it plainly. distribution.md adds that bug reports show some home-screen installs still lose data.
-- **Fix:** carry all of this into the Pickle It rebuild (onboarding 4.5 AC1 and the Settings storage card). Make the backup reminder count changes in both jars (v1-scope 4.7 AC5). The privacy policy and help copy should say plainly that the owner can't recover lost data.
+**m5. Hosting logs.** GitHub Pages and Cloudflare Pages log IP addresses and browsers. Name the host in the policy and link its privacy statement. No Cloudflare Web Analytics or any analytics without a new review.
 
-**m6. Hosting logs.** GitHub Pages and Cloudflare Pages both log visitor IP addresses and user agents as part of serving the site. The owner doesn't control or see these by default.
-- **Fix:** name the host in the privacy policy and link its privacy statement. Don't turn on Cloudflare Web Analytics or any other analytics without a new review and a policy update.
+**m6. Secrets and personal data in the repo: none found.** Tracked files contain no API keys, tokens, passwords or private keys; `.gitignore` excludes `.env*`; there are no fixtures yet. The regression CSV fixtures (data-model 4.1) must be made-up data, and the Health and Finance fixtures especially: no real names, providers or conditions.
 
-**m7. Secrets and personal data in the repo: none found.** I searched tracked files and the history of this branch for API keys, tokens, passwords and private keys: nothing. README and install-steps use `YOUR-USERNAME` placeholders. `.gitignore` excludes `.env` and `.env.*`. There are no test fixtures yet.
-- **Fix:** keep it that way: the regression CSV fixtures planned in data-model 4.1 must be made-up data (data-model 5.8), not real exports from the owner's personal version, since real exports contain station names and dates. If Option C2 is ever built, the Google OAuth client ID is public by design and fine to commit; a client *secret* must never be (and a browser app shouldn't have one).
+**m7. No web fonts or third-party requests.** (Replaces the old DM Sans finding, now moot.) app.css uses system font stacks only (app.css:22-24): no `@font-face`, no `@import`, no external URLs in any file, and sw.js ignores other origins. Keep it that way: if a web font is ever added, self-host it and add it to `FILES` in sw.js; never Google Fonts (it sends each visitor's IP to Google, which a Munich court found unlawful without consent in 2022).
 
-**m8. Framing (clickjacking).** Without `frame-ancestors` or `X-Frame-Options`, another site could frame the app. Damage is limited (an attacker can't pick a file or read data across origins), but a framed "Delete vehicle" or "Replace" tap is possible in theory.
-- **Fix:** covered by M1 on Cloudflare Pages (`_headers`: `Content-Security-Policy: frame-ancestors 'none'`). On GitHub Pages, accept the risk.
+**m8. Framing (clickjacking).** No `frame-ancestors`. Low impact (a framed "Delete" or "Replace" tap in theory). Covered by M2 on Cloudflare Pages via `_headers`; accept on GitHub Pages.
 
-**m9. Service worker scope.** sw.js only handles same-origin GETs under its own path (sw.js:29-33), which is correct and keeps it from touching another app's pages on a shared origin. Keep the scope check when renaming, and narrow the cache-cleanup filter to `pickle-it-` as data-model 2.1 says.
+**m9. Service worker scope is correct.** sw.js handles only same-origin GETs under its own path (sw.js:29-35) and deletes only `pickle-it-` caches. Keep both in the rebuild.
+
+**m10. Hours readings.** Low sensitivity, no new trust issue beyond m2. Include `readings` in export, Replace, delete-a-thing (deleting a thing must delete its readings, or they linger as orphans in the backup) and delete-all (M6).
 
 ---
 
-## 3. Privacy policy and terms: outline for v1 under Option A
+## 4. If cloud sync comes later
 
-Write in plain language, short, and true to how the app actually works. Host at a permanent URL on the same origin as the app (needed for the stores later and for the Settings "About" link in v1-scope 4.8). Date it and keep old versions.
+The owner decided local-only now with a path to cloud. data-model section 1 keeps that path open (random ids, `updatedAt`, no stored due dates). That's the right shape. When cloud is scheduled, it needs its own spec and privacy review before any build; this is what changes, so the owner can weigh it early.
+
+**Generally (any cloud option):** the owner becomes the holder of everyone's data. GDPR/UK GDPR controller duties for EU/UK users (lawful basis, access/deletion requests, records of processing, a processing agreement with the provider, transfer terms, 72-hour breach notice), US state breach-notification laws, in-app account deletion for the app stores, and real security operations (one bad access rule on Supabase or Firebase exposes every user at once). **Lawyer.**
+
+**Health data specifically raises the bar:**
+- **GDPR/UK GDPR Article 9:** health data is "special category". Holding it in the cloud needs explicit consent (or another Article 9 condition) and very likely a data protection impact assessment. **Lawyer.**
+- **US:** HIPAA almost certainly doesn't apply (the owner isn't a healthcare provider, plan or their contractor), but other rules do. The **FTC Health Breach Notification Rule** (updated 2024) covers consumer health apps outside HIPAA and treats unauthorized disclosure, not just hacking, as a breach. **Washington's My Health My Data Act** (and similar laws in Nevada and Connecticut) covers "consumer health data" broadly, has no revenue threshold, requires separate consent to collect and share it plus a dedicated health-data privacy policy, and Washington's has a private right of action. A reminder like "Therapy every Tuesday" plausibly counts. **Lawyer**, before any cloud build.
+- **App stores:** Apple's privacy label and Google Play's data safety form would list health and financial info; Google Play also has a health apps declaration (verify current requirements at the time).
+
+**Finance data:** reminders without amounts or account numbers are lower risk. US financial-privacy law (GLBA) targets financial institutions and likely doesn't reach a reminder app, but amounts or account details would change that analysis. **Lawyer.**
+
+**Design options that shrink the obligations** (for the future cloud spec):
+1. **End-to-end encryption** with a key only the user holds, so the owner's server stores data it can't read. Strongest option; costs: lost key = lost data, harder to build.
+2. **Sync only Vehicles and Home**; Health and Finance stay on the device. Simple and honest.
+3. **User's own drive** (Google Drive `drive.file` or `appDataFolder` scope, or iCloud): the owner holds no records, but takes on OAuth app verification and Google's user-data policy.
+4. Tombstones for deletes (data-model section 1) must also purge server copies and backups on account deletion.
+
+Recommendation for then: 1 or 2. Don't put Health in a readable server database.
+
+---
+
+## 5. Privacy policy and terms: outline for v1 (local-only)
+
+Plain language, short, true to how the app works. Host it at a permanent URL on the app's own origin (needed for the Settings "About" link, v1-scope 4.10, and for any later store listing). Date it and keep old versions.
 
 ### Privacy policy must say
-1. **Who we are and how to reach us.** The owner's name or trading name and a contact email (a dedicated address, not a personal one). **Lawyer:** whether a postal address is needed for EU/UK users.
-2. **The short version.** Pickle It stores what you enter only on your device. We don't have accounts, we don't receive your data, and we can't see it.
-3. **What the app stores on your device.** List the categories in section 1 (vehicles, fill-ups including gas station names and dates, maintenance and home tasks, notes, shops, app settings), and that it uses browser storage (IndexedDB and localStorage) and an offline cache. Say this storage is needed for the app to work and isn't used for tracking.
-4. **What we don't collect.** No analytics, no ads, no trackers, no third-party scripts or fonts, no location permission, no contacts. (Only true if M3 is fixed by self-hosting and M1's CSP holds the line.)
-5. **Hosting.** The site is served by GitHub Pages or Cloudflare Pages (whichever is chosen), which receives your IP address and browser details when you load it, under its own privacy policy (link it).
-6. **Backups.** Export creates an unencrypted file containing everything you've entered. Where it goes (email, iCloud, Google Drive, AirDrop) is your choice and is governed by that service's terms. Imported files are read on your device only.
-7. **Your control.** How to export, how to delete one record, how to delete everything (m4), and that uninstalling the home-screen app or clearing site data deletes it. Because we hold no data, we can't access, correct, export or delete it for you. **Lawyer:** how to phrase GDPR/UK GDPR and US state-law rights when the controller holds nothing.
-8. **Data loss.** We can't recover lost data. Browsers, especially Safari on iPhone, may delete it. Keep backups.
-9. **Children.** Not directed at children under 13 (or 16 in some EU countries). **Lawyer:** confirm age wording.
-10. **Changes.** How changes are announced (e.g. a note in the app), with the effective date.
-11. **App store disclosures, if Option B/C of distribution.md happens later:** Google Play data safety form and Apple privacy label would both be "no data collected", consistent with this policy.
+1. **Who we are and how to reach us.** Owner's name or trading name and a dedicated contact email. **Lawyer:** whether a postal address is needed for EU/UK users.
+2. **The short version.** Pickle It saves what you enter only on your device. No accounts; we never receive your data and can't see it.
+3. **What the app saves on your device.** Things you track (vehicles, homes, people, households), fill-ups including gas station names and dates, tasks and their due dates, done and skipped history, hour-meter readings, providers and shops, notes, and app settings. Say plainly that **the Health and Finance jars can hold health and financial information if you type it in**, and that the app never asks for diagnoses, medications, account numbers or passwords. Uses browser storage (IndexedDB, localStorage) and an offline cache, only so the app works; not for tracking.
+4. **Information about other people.** You may add family members in Health. Their information stays on your device like yours. **Lawyer:** wording.
+5. **What we don't collect.** No analytics, ads, trackers, third-party scripts or web fonts, location permission, contacts. (True today; M2's CSP keeps it true.)
+6. **Hosting.** Served by [GitHub Pages or Cloudflare Pages], which receives your IP address and browser details when you load the app, under its own privacy policy (link).
+7. **Backups.** Export creates an unencrypted file with everything you've saved, including Health and Finance tasks and notes. Where you put it (email, cloud drive, AirDrop) is your choice and that service's terms apply. Imported files are read on your device only.
+8. **Your control.** How to export, delete one record, hide a jar, and delete everything (M6); uninstalling or clearing site data also deletes it. Because we hold no data, we can't access, correct, export or delete it for you. **Lawyer:** how to phrase GDPR/UK GDPR and US state-law rights (including Washington's My Health My Data Act) when the owner holds nothing.
+9. **Data loss.** We can't recover lost data. Browsers, especially Safari on iPhone, may delete it. Keep backups.
+10. **Not a medical or financial service.** Pickle It doesn't give medical or financial advice and isn't a health record. (Also in terms.)
+11. **Children.** Not directed at children under 13 (16 in some EU countries). **Lawyer:** age wording.
+12. **Changes.** How changes are announced (a note in the app) and the effective date. Any future cloud feature will come with an updated policy and, for Health data, a separate opt-in before anything leaves the device.
+13. **Store disclosures, if store apps happen later:** Google Play data safety and Apple privacy label both "no data collected", consistent with this policy, as long as storage stays local.
 
 ### Terms of use should say
-A short terms page is worth having even for a free app. **Lawyer** to review all of it, especially items 3-5, which are jurisdiction-dependent.
-1. Free to use, provided as is, may change or stop.
-2. **Maintenance reminders are general guidance, not professional advice.** Follow the vehicle manufacturer's schedule and qualified professionals for safety-critical work (brakes, gas furnaces, electrical). The starter libraries are generic (v1-scope 4.6.3); the terms should back that up.
-3. **Data is the user's responsibility.** The owner doesn't store it and isn't liable for loss; keep backups.
-4. Limitation of liability and warranty disclaimer. Consumer-protection laws (EU, UK, Australia, some US states) limit how far these can go.
-5. Governing law.
-6. Acceptable use is barely relevant for a single-user offline app; keep it to a line.
-7. Open-source license of the code, if the repo goes public (separate from the terms; pick a license deliberately, and include the DM Sans OFL notice).
-
-### If Option B were chosen instead
-Everything above changes: lawful basis per data type, retention periods, sub-processors (Supabase/Firebase, email sender), international transfers, account deletion in-app, data export on request, breach notification, security description, and likely a data processing agreement. That's a full lawyer engagement, not a review.
+**Lawyer** to review all of it, especially 4-6, which depend on jurisdiction.
+1. Free, provided as is, may change or stop.
+2. **Reminders are general guidance, not professional advice.** Vehicles and Home: follow the manufacturer's schedule and use qualified professionals for safety-critical work (brakes, gas furnaces, electrical). **Health: not medical advice; follow your doctor or pharmacist; don't rely on the app for medication timing.** **Finance: not tax, legal or financial advice; check real deadlines with the agency, insurer or lender.** Starter libraries are generic (v1-scope 4.8 AC 4).
+3. **No guarantee a reminder appears.** The app shows due tasks only when opened; there are no notifications. A missed reminder (a tax deadline, a prescription refill) is the user's responsibility.
+4. **Data is the user's responsibility.** The owner doesn't store it and isn't liable for loss; keep backups.
+5. Limitation of liability and warranty disclaimer. Consumer-protection laws (EU, UK, Australia, some US states) limit how far these go.
+6. Governing law.
+7. Acceptable use: one line; it's a single-user offline app.
+8. Open-source license of the code, if the repo goes public (separate from the terms; pick deliberately).
 
 ---
 
 ## Needs a decision (owner)
-1. **Storage:** A (device only), B (accounts and sync) or C2 (automatic sync to the user's drive)? Recommend **A**, with the existing share-sheet export (C1) promoted as the backup path.
-2. **Hosting origin:** own origin (Cloudflare `pages.dev` or a custom domain) or the shared `github.io` origin with the old app? Recommend **own origin**. It isolates the two apps' data from each other's bugs. Trade-off: no same-origin direct copy (data-model 4.2); users migrate by CSV.
-3. **DM Sans:** self-host or Google Fonts? Recommend **self-host** (no third-party request, works offline, nothing to disclose).
-4. **Lawyer review:** get one before launch for the privacy policy, terms, and the name/trademark question already flagged by release-manager? Recommend **yes**, one engagement covering all three.
+1. **Health and Finance scope (v1-scope D1, D2):** from a privacy view, recommend **A and A** (reminders only, no medical fields, no amounts). B for Finance (amounts) is fine as v1.1 after a short review; Health B and C, and Finance C, should stay out.
+2. **Launch origin:** own origin (custom domain or Cloudflare `pages.dev`) or the shared `github.io` origin? Recommend **own origin** (M1). Storage names already keep the data apart; a separate origin also isolates bugs and site-data clearing. Already in docs/open-questions.md.
+3. **Discreet Pantry rows for Health and Finance:** (A) rely on hiding jars (D8) and discreet task names, (B) add a per-jar "hide names on the Pantry" setting in v1, (C) B in v1.1. Recommend **A for v1, C later**, provided D8 is approved.
+4. **Export choice:** (A) one full backup with the warning, (B) add an "Include Health and Finance" checkbox. Recommend **A** for v1; B only if users ask.
+5. **Lawyer review:** one engagement before launch covering the privacy policy, terms and the name/trademark question (open-questions.md). Recommend **yes**; tell the lawyer about the Health jar specifically, since state health-data laws are the newest and least settled area.
