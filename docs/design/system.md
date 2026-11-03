@@ -15,15 +15,32 @@ Tokens live on `:root` in app.css, with a dark set per palette. Green is the def
 | `--line` | #d8ded6 | #2a362c | Dividers only (not control borders) |
 | `--accent` | #2f6b3f | #7cc48d | Primary buttons, active tab, links |
 | `--accent-ink` | #ffffff | #0c140e | Text and icons on `--accent` |
-| `--ok` / `--ok-bg` | #1f7a5a / #e1f1e8 | #86d6b0 / #163126 | "Done" badges, success notes |
+| `--ok` / `--ok-bg` | #1e7858 / #e1f1e8 | #86d6b0 / #163126 | "Done" badges, success notes. Light `--ok` darkened from #1f7a5a (decided) |
 | `--wait` / `--wait-bg` | #85600a / #f8eed3 | #f0c46a / #382b0e | Warnings, iPhone note, "pending" tags in mockups |
-| `--err` / `--err-bg` | #b3261e / #fbe9e7 | #ff8a80 / #3b1714 | Overdue, red dot, errors, destructive |
+| `--err` / `--err-bg` | #b3261e / #fbe9e7 | #ff8a80 / #3b1714 | Overdue, jar red dot, backup dot, errors, destructive |
 | `--display-bg` / `--display-fg` | #141a15 / #c8e66a | #070a07 / #c8e66a | Pump readout only |
 | `--run` | #b5562a | #ff9a6b | 2-month running MPG line |
-| `--err-ink` **(proposed)** | #ffffff | #1a0b0a | Text on `--err` buttons. Fixes white on red at 2.3:1 in dark |
-| `--line-strong` **(proposed)** | #7a867c | #6f7f72 | Control borders, switch tracks, outlines. Fixes `--line` at 1.4:1 |
+| `--err-ink` | #ffffff | #1a0b0a | Text on `--err` buttons (Delete, Delete all data). Same in every palette. Fixes white on red at 2.3:1 in dark |
+| `--line-strong` | #7a867c | #6f7f72 | Control borders, switch tracks, outlines, the bar divider. Per palette (below). Fixes `--line` at 1.4:1 |
 
 Derived (no new token): the overdue row tint is `color-mix(in srgb, var(--err-bg) 60%, var(--surface))`.
+
+`--err-ink`, `--line-strong` and the darker light `--ok` are decided (decisions.md, 2026-11-03). Values come from docs/reviews/contrast-2026-11-03.md. app.css doesn't have them yet; adding them is a build step (frontend-engineer).
+
+### Per-palette values for the new tokens
+`--err-ink` is the same everywhere: #ffffff light, #1a0b0a dark. `--ok` dark is unchanged.
+
+| Palette | `--line-strong` light | `--line-strong` dark | `--ok` light (was) |
+|---|---|---|---|
+| Green | #7a867c | #6f7f72 | #1e7858 (#1f7a5a) |
+| Blue | #7a858f | #697580 | #2c784c |
+| Red | #858180 | #746f6c | #2c784c |
+| Orange | #878179 | #777067 | #3b7648 |
+| Purple | #818296 | #6d6e86 | #2c785b |
+| Teal | #748886 | #607672 | #2c784c |
+| Monochrome | #838383 | #727272 | #2c784c |
+
+Use `--line-strong` for things you have to see to use (input, select and textarea borders, `.btn2`, chips, switch tracks). Keep `--line` for dividers, card edges and list rules.
 
 ### Contrast, Green (WCAG 2.2 AA)
 | Pair | Light | Dark |
@@ -36,12 +53,13 @@ Derived (no new token): the overdue row tint is `color-mix(in srgb, var(--err-bg
 | muted on overdue tint (thing name) | 5.2 | 6.7 |
 | err on err-bg (Overdue badge) | 5.6 | 7.0 |
 | wait on wait-bg | 4.9 | 8.4 |
-| ok on ok-bg | 4.50 (no margin) | 8.2 |
-| red dot (err) on surface, non-text | 6.5 | 7.3 |
-| line-strong on surface, non-text **(proposed)** | 3.8 | 3.9 |
+| ok on ok-bg | 4.62 | 8.2 |
+| red dot and backup dot (err) on surface, non-text | 6.5 | 7.3 |
+| line-strong on surface / bg, non-text | 3.8 / 3.4 | 3.9 / 4.4 |
+| err-ink on err (Delete buttons) | 6.5 | 8.4 |
 | display-fg on display-bg | 12.6 | high |
 
-Only Green was checked. The other 6 palettes need the same pass before build (qa-accessibility-tester).
+All 7 palettes, light and dark, are checked in docs/reviews/contrast-2026-11-03.md (`node tests/contrast-check.mjs`). With the values above, everything passes.
 
 ## 2. Type
 
@@ -74,6 +92,8 @@ Text must still work at the largest system text size. Tab labels can cut off wit
 - Pantry: a raised 46 x 40 rounded square in `--accent` with a white cabinet icon, then a 1 px `--line-strong` divider. When a jar is active, the square becomes outlined (2 px accent border, accent icon, surface fill).
 - Jar: a 30 px jar outline (lid plus body) with the jar icon inside at 12 px. Inactive: `--muted`. Active: jar filled `--accent`, icon `--accent-ink`, label bold in `--accent`.
 - Red dot: a 12 px `--err` circle with a 2 px `--surface` ring at the jar's top right. Its non-color equivalent is the link's accessible name, "Vehicles, has items due this week". The dot itself is `aria-hidden`.
+
+**Backup dot.** Same dot as the jar red dot, `--err` (not `--display-fg`, which nearly vanishes in light mode), shown when a backup is due. The dot is `aria-hidden`; the link or button carrying it adds hidden text ", backup due" (e.g. "Settings, backup due").
 - Order is fixed: Vehicles, Home, Health, Finance. Hidden jars have no tab, and the other tabs share the width.
 
 **Due box.** A native `<details>` with `<summary>` holding the title, range hint ("Overdue and the next 7 days", "In 1 to 4 weeks", "4 weeks or more"), a count pill (accessible name "6 tasks") and a chevron. Whether each box is open is remembered on the device. When a box is empty, it shows one line; This week shows a canning line instead. Over 50 tasks: a footer saying "Showing 50 of 57" with a chip link to each jar holding the rest.
@@ -93,17 +113,19 @@ Tapping the row opens its quick actions: Done (primary), Skip ("Skip this time" 
 | Time or fixed date | `Today`, `Tomorrow`, `in 2 days`, `Nov 12` | "Due today", "Due in 2 days, Thursday November 5" |
 | Overdue (time) | badge "Overdue" + `since Oct 28` | "Overdue since October 28" |
 | Overdue (reading) | badge "Overdue" + `120 mi over` | "Overdue, 120 miles over" |
-| No estimate (D11, pending) | `63 hr` | "63 hours left. No date estimated yet." |
-| Estimate passed or 0 left (D11, pending) | `Due now` | "Due now. …add a reading to update it." |
-| No reading (D11, pending) | `Add a reading` (accent) | "No hour reading yet. Add a reading." |
+| No estimate | `63 hr` | "63 hours left. No date estimated yet." |
+| Estimate passed or 0 left | `Due now` | "Due now. …add a reading to update it." |
+| No reading (miles or hours) | `Add a reading` (accent) | "No hour reading yet. Add a reading." |
 
-The amount and the date are two no-wrap chunks, so a long value breaks between them, never inside one. Units: "mi", and "hr" for every amount (data-model 3.3a). The year shows only outside the current year.
+A date is estimated only when the latest reading is under 90 days old and two readings are 30+ days apart; otherwise the no-estimate text shows. The amount and the date are two no-wrap chunks, so a long value breaks between them, never inside one. Units: "mi", and "hr" for every amount (data-model 3.3a). The year shows only outside the current year.
 
 **Overdue.** Never shown by color alone: tinted row, plus a badge with a warning-triangle icon and the word "Overdue", plus words in the due text.
 
 **Card.** `--surface`, 1 px `--line`, 12 px radius, 16 px padding.
 
 **Thing row.** The `.arow` from Settings C: a 40 px icon tile, name, a meta line ("48,210 mi · 31.4 MPG lifetime", "12 tasks") and a chevron. Engines add a line with the reading and a 44 px "Add reading" button.
+
+**Delete button.** `.save.danger`: `--err` fill, `--err-ink` text. Used for Delete, Delete and replace, and Delete all data.
 
 **Badge.** 12 px / 700 text on a tinted pill, always with a word, often an icon: Overdue (err), Done (ok), Skipped (muted), warning (wait).
 
@@ -117,7 +139,7 @@ The amount and the date are two no-wrap chunks, so a long value breaks between t
 
 **Toast.** `role="status"`, ink on bg, with an Undo button (44 px). Shown after Done or Skip.
 
-**Pending tag (mockups only).** A dashed `--wait` pill with a clock icon, reading "pending owner decision". Not an app component.
+**Pending tag (mockups only).** A dashed `--wait` pill with a clock icon, marking something not yet decided or confirmed. Not an app component.
 
 ## 5. Icons
 - 24 px grid, 2 px stroke, round caps and joins, no fill, `currentColor`. Drawn at 20-22 px in rows and buttons, 14-18 px in badges and actions, 72 px for empty states.
@@ -146,6 +168,5 @@ The amount and the date are two no-wrap chunks, so a long value breaks between t
 Other empty states: "Empty shelves." (no things), "This jar's still empty." (an empty jar), "No deadlines this week. Your coins are in the jar." (Finance, This week). Done confirmation: "Sealed. Next oil change on 2012 Tacoma: 5,000 mi / May 3."
 
 ## 7. Open items in this system
-- `--err-ink` and `--line-strong` are proposed (open question in docs/open-questions.md).
-- Bottom bar semantics (nav and links, not a tablist) is a design choice for the owner to confirm.
-- The 6 other palettes haven't been contrast-checked.
+- app.css still lacks `--err-ink`, `--line-strong` and the new light `--ok`, and still colors the backup dot with `--display-fg`. That's a build step (frontend-engineer).
+- Where the backup dot sits now that Settings is reached from the Pantry gear (not a tab) isn't drawn in the mockups yet.
