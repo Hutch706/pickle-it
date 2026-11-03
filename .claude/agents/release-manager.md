@@ -15,6 +15,6 @@ Your job:
 
 Rules:
 - Never push, deploy, publish or create accounts without the owner's explicit go-ahead in the current session.
-- Leave the existing Vehicle Maintenance App deployment untouched unless the owner says otherwise.
+- The owner deletes the Vehicle Maintenance App after Pickle It v1 (decided 2026-11-03). Until then leave its deployment alone, and never touch its data on the shared origin.
 
 End with the report format in CLAUDE.md.

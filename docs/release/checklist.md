@@ -3,8 +3,8 @@
 Everything here must be true before v1 goes public. Owned by release-manager. Draft 2026-11-03; items will be added as specs land. See docs/release/distribution.md for the reasoning.
 
 ## Owner decisions made and logged in docs/decisions.md
-- [ ] Distribution: PWA only, Google Play, Apple App Store (see distribution.md)
-- [ ] Launch web address chosen, and treated as permanent
+- [x] Distribution: PWA only for v1 (decided 2026-11-03)
+- [x] Launch web address: `https://hutch706.github.io/pickle-it/` on GitHub Pages (decided 2026-11-03); treat as permanent, don't rename the repo or account
 - [ ] Name confirmed (trademark lawyer opinion on "PICKL-IT" and the App Store "PickleIt" apps)
 - [ ] Data storage: local-only or accounts with sync
 - [ ] v1 categories and other open questions in docs/open-questions.md closed or deferred on purpose
@@ -20,7 +20,6 @@ Everything here must be true before v1 goes public. Owned by release-manager. Dr
 ## Data safety
 - [ ] CSV export works and includes every kind of record
 - [ ] CSV import works, including a file exported from the Vehicle Maintenance App
-- [ ] Migration from the Vehicle Maintenance App tested end to end (export old, import new, nothing lost)
 - [ ] Storage names are Pickle It's own (`pickle-it` database, `pickle-it:` keys, `pickle-it-` cache): done 2026-11-03; re-check before launch
 - [ ] Backup reminder works and is easy to find
 - [ ] Installed-app storage tested on iPhone: data still there after 8+ days unused
@@ -40,11 +39,12 @@ Everything here must be true before v1 goes public. Owned by release-manager. Dr
 - [ ] install-steps.md and README.md rewritten for Pickle It
 
 ## Hosting (needs owner go-ahead for every account, purchase and deploy)
-- [ ] Host account ready (GitHub Pages or Cloudflare Pages)
-- [ ] Custom domain bought and set to auto-renew, if chosen
-- [ ] HTTPS working at the final address
+- [ ] GitHub Pages turned on for `Hutch706/pickle-it` (branch and folder chosen by the owner)
+- [ ] HTTPS working at `https://hutch706.github.io/pickle-it/`
+- [ ] Manifest, sw.js and all links still use relative paths (nothing starting with `/`)
+- [ ] Installed app opens and works offline at `/pickle-it/` on iPhone and Android
 - [ ] sw.js cache name and FILES list match the shipped files
-- [ ] Vehicle Maintenance App deployment checked afterward: still live and unchanged
+- [ ] After v1 is live: owner deletes the Vehicle Maintenance App (repo or Pages site). Its database, keys, caches and service worker stay in users' browsers until they clear site data; Pickle It must not read or delete them
 
 ## Release
 - [ ] Version number set (start at 1.0.0) and shown in Settings or About

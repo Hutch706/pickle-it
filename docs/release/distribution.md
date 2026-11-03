@@ -1,6 +1,6 @@
 # Pickle It: distribution, hosting and name check
 
-Status: draft recommendation from release-manager, 2026-11-03. The owner decides. Nothing here has been bought, registered, deployed or published.
+Status: release-manager, 2026-11-03. Distribution (PWA only) and hosting (GitHub Pages) are decided; see docs/decisions.md. The owner decides everything else. Nothing here has been bought, registered, deployed or published.
 
 Facts below were checked on 2026-11-03. Fees and store rules change, so re-check the official pages before acting.
 
@@ -55,19 +55,29 @@ This depends on the open "Data storage" question. If Pickle It adds accounts and
 
 ## 2. Hosting the PWA
 
-**Rule: the existing Vehicle Maintenance App deployment stays untouched.** Pickle It gets its own new address. Don't rename, move or redirect the old repository or its GitHub Pages site. Its users' data is tied to that address.
+**Decided 2026-11-03 (docs/decisions.md, Phase 1):** launch on the GitHub Pages address, the same `github.io` origin as the Vehicle Maintenance App. The owner deletes the Vehicle Maintenance App once Pickle It v1 is ready. The old app has no users with data, so there is no migration notice, final banner or overlap period. This replaces the earlier recommendation of a separate origin or custom domain.
 
-**The Pickle It launch address must be permanent.** Data is tied to the exact origin (scheme + host + port). A GitHub Pages project site lives at `https://USER.github.io/REPO/`. Every project site on that account shares the origin `USER.github.io`, so it shares storage limits with the Vehicle Maintenance App. Pickle It now uses its own storage names (`pickle-it` database, `pickle-it:` keys), so the two apps no longer collide on data, but they would still share the origin's storage quota and site-data clearing. A custom domain or a separate host avoids this entirely.
+**Launch address.** The git remote is `https://github.com/Hutch706/pickle-it.git`, so GitHub Pages will serve the app at **`https://hutch706.github.io/pickle-it/`** (hyphen, matching the repo name, not the local folder name `pickle_it`). GitHub lowercases the account name in the host; the path keeps the repo name as written.
 
-| Option | Cost | Address | Notes |
+**Treat that address as permanent.** Data is tied to the origin (`https://hutch706.github.io`), and the installed app and service worker are tied to the `/pickle-it/` path. Renaming the repo or the GitHub account changes the address: installed copies stop updating, and users must export a CSV at the old address and import it at the new one. Moving to a custom domain later has the same cost, so if one is ever wanted, do it before the first public user.
+
+**The app works under that path.** Checked 2026-11-03:
+- `manifest.webmanifest` uses relative values: `"id": "./"`, `"start_url": "./"`, `"scope": "./"`, and relative icon paths. These resolve to `/pickle-it/`.
+- `app.js` registers `./sw.js`, so the service worker's scope is `/pickle-it/`.
+- `sw.js` lists its files as `./...`, works out its scope with `new URL("./", self.location)`, ignores requests outside that scope, and only deletes caches starting with `pickle-it-`.
+- Nothing needs changing for the path. Keep it relative: any new file or link that starts with `/` would point at `hutch706.github.io/` and break.
+
+**Sharing the origin with the old app.** Pickle It uses its own storage names (`pickle-it` database, `pickle-it:` keys, `pickle-it-` caches), so the apps don't read or overwrite each other's data. They do share the origin's storage quota, and a user who clears site data for `hutch706.github.io` clears both.
+
+**Deleting the Vehicle Maintenance App (owner's step, after v1).** Deleting the repo or turning off its Pages site removes the files from the server. It does not reach into users' browsers: anyone who opened the old app keeps its database, `localStorage` keys, caches and service worker on their device until they clear site data. That service worker can keep showing the cached old app offline at its old path. Pickle It must never read, delete or "clean up" those leftovers, because it can't safely tell what belongs to whom on a shared origin. Users bring old data over only by CSV export and import.
+
+| Host option (for reference) | Cost | Address | Notes |
 |---|---|---|---|
-| GitHub Pages, default address | Free (public repo) | `https://USER.github.io/pickle_it/` | Same origin as the old app: storage collision risk (above). Renaming the repo changes the address and strands data. 1 GB site, 100 GB/month soft bandwidth. Terms say it is not for running an online business; a free app is fine. ([GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits)) |
-| Cloudflare Pages, default address | Free | `https://pickle-it.pages.dev` (if the name is free) | Its own origin, so no collision. 500 builds/month, 20,000 files, 25 MiB per file on the free plan. Direct upload, no build needed. Needs a Cloudflare account. ([Cloudflare Pages limits](https://developers.cloudflare.com/pages/platform/limits/)) |
-| Custom domain (on either host) | About $10-20/year | e.g. `https://pickleit.org` or `https://app.example.com` | Most permanent: you can switch hosts later without changing the address, so no stranded data. Must be renewed every year, forever; a lapsed domain strands all users. Needs a registrar account (owner only). |
+| **GitHub Pages, default address (chosen)** | Free (public repo) | `https://hutch706.github.io/pickle-it/` | Same origin as the old app (above). 1 GB site, 100 GB/month soft bandwidth. Terms say it is not for running an online business; a free app is fine. ([GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits)) |
+| Cloudflare Pages, default address | Free | `https://pickle-it.pages.dev` (if the name is free) | Its own origin. Needs a Cloudflare account. ([Cloudflare Pages limits](https://developers.cloudflare.com/pages/platform/limits/)) |
+| Custom domain (on either host) | About $10-20/year | e.g. `https://pickleit.org` | Address survives a change of host. Must be renewed every year; a lapsed domain strands all users. Waits on the lawyer's name opinion. |
 
-**Recommendation:** a custom domain, served from Cloudflare Pages or GitHub Pages. It's the only choice where the address survives a change of host. If the owner wants $0, use Cloudflare Pages' `pages.dev` address rather than the shared `github.io` origin. Whichever is chosen, set it once before the first public user and never change it.
-
-Creating any account, buying a domain or deploying needs the owner's go-ahead.
+Turning on GitHub Pages and every deploy need the owner's go-ahead.
 
 ## 3. Name check: "Pickle It"
 
