@@ -1,6 +1,28 @@
 # Decision log
 Newest first. Each entry: date, decision, why. Only the owner makes decisions.
 
+## 2026-11-03 (Phase 1 decisions)
+- **Health tracks reminders only in v1:** recurring appointments and renewals per person, no medical fields.
+- **Finance tracks money deadlines only in v1:** no amounts. Optional amounts may follow later after a privacy review.
+- **Ship as an installable web app (PWA) only for v1.** Google Play maybe later; no Apple App Store for v1.
+- **Launch on the GitHub Pages address for now** (same github.io origin as the Vehicle Maintenance App). Once Pickle It v1 is ready, the owner deletes the Vehicle Maintenance App, since Pickle It replaces it. Overrides the recommendation of a separate origin. Why: Pickle It includes everything the old app does.
+- **One lawyer engagement before launch** covering the name ("PICKL-IT" trademark), privacy policy and terms, before spending on a domain or branding.
+- **Due boxes:** This week = overdue plus today to day 6 (rolling); This month = days 7-27; Later = day 28 on.
+- **Mileage tasks show "<miles remaining> / <estimated date>"**, with the date estimated from recent driving. No "about" label.
+- **Hours-of-use tasks show "<hours remaining> / <estimated date>"**, with the date estimated from hours per day between readings.
+- **Each small engine is its own thing in Home** (e.g. "Mower") and holds its own hour reading.
+- **A task can combine two measures** only as miles + time or hours + time (whichever comes first).
+- **Several homes and several people** are allowed.
+- **Users can hide jars they don't use.**
+- **Units: miles and gallons** for v1.
+- **Season dates:** the content curator picks per task, with fixed season starts as the fallback.
+- **Health/Finance privacy:** discreet task names plus hiding jars in v1; a per-jar "hide names" setting can come in v1.1. One full backup export with a plain warning that it isn't encrypted; no per-jar export option for now.
+- **Settings is reached from the Pantry** and has its own tabs instead of tabs inside each jar:
+  - **App settings:** light/dark mode, color palette, import and export, the data storage note, how to install as an app, and a "delete all data" button that asks the user to confirm at least twice.
+  - **Assets:** edit houses, appliances, vehicles and family members, plus all tasks for each one.
+  - Layout to be chosen from three mockups: all assets in one tab, a tab per category, and a designer's choice.
+- **Personal version stays separate.** It won't be migrated wholesale. Long-term, Pickle It gets AI features such as reading fill-up and mechanic receipts. Not in v1.
+
 ## 2026-11-03 (later)
 - **Pickle It saves data under its own names.** Database `pickle-it` and `pickle-it:` settings keys, instead of the Vehicle Maintenance App's. Why: both apps may be hosted on one web address (one github.io account), where they would otherwise share and overwrite each other's data. The code that moved data from older app names (Fill-Up Receipts) is removed, since on a shared address it would take another app's data. Users bring Vehicle Maintenance App data over with a CSV export and import.
 
