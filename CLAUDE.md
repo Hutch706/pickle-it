@@ -49,11 +49,11 @@ Every agent ends its work with:
 
 ## Tech stack
 - Plain HTML, CSS and JavaScript. No framework, no build step, no dependencies, no package.json.
-- Installable web app (PWA): `manifest.webmanifest` plus a network-first service worker (`sw.js`) for offline use. If you add, rename or remove a file the app loads, update `FILES` and `CACHE` in `sw.js`.
-- Files: `index.html` (all screens and dialogs), `app.css` (color tokens and palettes at the top, light/dark), `app.js` (screens and interactions), `data.js` (storage, MPG and due-mileage math, CSV), `icons/`.
+- Installable web app (PWA): `manifest.webmanifest` plus a network-first service worker (`sw.js`) for offline use. It re-saves each file whenever it loads from the network, so edits need no cache bump; keep `FILES` in `sw.js` matching the app's files.
+- Files: `index.html` (all screens and dialogs), `app.css` (color tokens and palettes at the top, light/dark; Green is the default), `app.js` (screens and interactions), `data.js` (storage, MPG and due-mileage math, CSV), `icons/`.
 - Storage: IndexedDB database `vehicle-maintenance-app` (stores `vehicles`, `fillups`, `services`, `settings`), local to each browser. UI preferences (theme, palette) are in `localStorage` under `vma:` keys. No server, no accounts.
-- Backup: one CSV file with a `record_type` column (`vehicle`, `schedule`, `shop`, `fillup`, `maintenance`); format documented in README.md. Import previews first, then Merge or Replace.
-- Maintenance schedules are mileage-only (`every` / `remind` in miles; `STANDARD_SCHEDULE` in `data.js`).
+- Backup: one CSV file with a `record_type` column (`vehicle`, `schedule`, `shop`, `fillup`, `maintenance`) and a `format_version` column (`CSV_FORMAT_VERSION` in `data.js`); format documented in README.md. Import previews first, then Merge or Replace.
+- Maintenance schedules are still mileage-only and vehicle-only (`every` / `remind` in miles; `STANDARD_SCHEDULE` in `data.js`). docs/decisions.md says this gets generalized to any measure and to all categories.
 
 ## Commands
 - Run locally: `python3 -m http.server 8000` in the repo root, then open http://localhost:8000. Opening `index.html` directly won't run the service worker.

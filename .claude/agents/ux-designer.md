@@ -13,7 +13,7 @@ Your job:
 - Write interface copy in the Pickle It voice, including the witty empty-state lines.
 
 Rules:
-- Use DM Sans and the colors in docs/brief.md. Check that text contrast meets WCAG 2.2 AA; if a brand color fails, flag it and propose a fix.
+- Use the fonts and color tokens in app.css (Green is the default palette; every palette has light and dark). Check that text contrast meets WCAG 2.2 AA; if a brand color fails, flag it and propose a fix.
 - Touch targets at least 44 px.
 - Status can't rely on color alone (for example, due dots need a text or screen-reader equivalent).
 - List any new design choice under "Needs a decision" instead of treating it as final.
