@@ -17,15 +17,9 @@ const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 function setMsg(node, text, kind = "") { node.textContent = text; node.className = "status" + (kind ? " " + kind : ""); }
 const setStatus = (text, kind) => setMsg($("status"), text, kind);
 const pref = {
-  get(k, d = null) { try { const v = localStorage.getItem("vma:" + k); return v == null ? d : v; } catch { return d; } },
-  set(k, v) { try { localStorage.setItem("vma:" + k, v); } catch {} },
+  get(k, d = null) { try { const v = localStorage.getItem("pickle-it:" + k); return v == null ? d : v; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("pickle-it:" + k, v); } catch {} },
 };
-// Screen settings saved under the app's old name (Fill-Up Receipts, "fur:") move to the new prefix once.
-try {
-  const old = [];
-  for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith("fur:")) old.push(k); }
-  for (const k of old) { const nk = "vma:" + k.slice(4); if (localStorage.getItem(nk) == null) localStorage.setItem(nk, localStorage.getItem(k)); localStorage.removeItem(k); }
-} catch {}
 const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const isAndroid = /Android/i.test(navigator.userAgent);
 const isMobile = isIOS || isAndroid;
@@ -858,7 +852,7 @@ $("shopAdd").addEventListener("submit", async (ev) => {
 });
 
 // ---------- Settings: Light / Dark / System and color palette ----------
-// Saved on this device as vma:theme and vma:palette. The <head> script applies them before the page draws.
+// Saved on this device as pickle-it:theme and pickle-it:palette. The <head> script applies them before the page draws.
 const PALETTES = [
   ["green", "Green"], ["blue", "Blue"], ["red", "Red"], ["orange", "Orange"],
   ["purple", "Purple"], ["teal", "Teal"], ["mono", "Monochrome"],

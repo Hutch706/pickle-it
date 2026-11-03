@@ -1,6 +1,9 @@
 # Decision log
 Newest first. Each entry: date, decision, why. Only the owner makes decisions.
 
+## 2026-11-03 (later)
+- **Pickle It saves data under its own names.** Database `pickle-it` and `pickle-it:` settings keys, instead of the Vehicle Maintenance App's. Why: both apps may be hosted on one web address (one github.io account), where they would otherwise share and overwrite each other's data. The code that moved data from older app names (Fill-Up Receipts) is removed, since on a shared address it would take another app's data. Users bring Vehicle Maintenance App data over with a CSV export and import.
+
 ## 2026-11-03
 - **Decisions win over the brief.** Where docs/brief.md and this log disagree, this log is right; the brief has been updated to match.
 - **Look follows app.css.** Fonts and colors come from the Vehicle Maintenance App's app.css, not DM Sans. Replaces the earlier "DM Sans and the colors in docs/brief.md" entry.

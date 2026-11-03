@@ -57,7 +57,7 @@ Opening `index.html` by double-clicking won't run the offline parts. Instead, in
 
 ## Colors, Light/Dark and palettes
 
-The Settings screen has an **Options** section: Light / Dark / System, and a Color picker (Blue, Green, Red, Orange, Purple, Teal, Monochrome). The choices are saved on the device (`vma:theme`, `vma:palette`) and applied as `data-theme` and `data-palette` on `<html>`. Blue is the default at the top of `app.css`; the other palettes are in the "Color palettes" section below it. To add one, copy a palette block in `app.css` and add its name to `PALETTES` in `app.js`.
+The Settings screen has an **Options** section: Light / Dark / System, and a Color picker (Green, Blue, Red, Orange, Purple, Teal, Monochrome). The choices are saved on the device (`pickle-it:theme`, `pickle-it:palette`) and applied as `data-theme` and `data-palette` on `<html>`. Green is the default at the top of `app.css`; the other palettes are in the "Color palettes" section below it. To add one, copy a palette block in `app.css` and add its name to `PALETTES` in `app.js`.
 
 ## The backup file (CSV)
 

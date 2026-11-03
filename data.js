@@ -92,8 +92,8 @@ const serviceKey = (s) => [s.vehicleId, s.date, s.odometer, s.itemId, lower(s.it
 
 // ---------- Storage (IndexedDB) ----------
 // Stores: vehicles, fillups, services (maintenance log), settings ({ key, value }: shops, lastExport, lastChange).
-const DB_NAME = "vehicle-maintenance-app";
-const OLD_DB_NAME = "fillup-receipts"; // where data was kept when the app was called Fill-Up Receipts
+// Its own name, not the Vehicle Maintenance App's: both apps may share one web address (and so one browser storage).
+const DB_NAME = "pickle-it";
 const DB_VERSION = 1;
 let idb = null;
 const S = { vehicles: [], fillups: [], services: [], shops: [], lastExport: null, lastChange: null };
@@ -108,41 +108,10 @@ function openDB() {
       for (const s of ["vehicles", "fillups", "services"]) if (!d.objectStoreNames.contains(s)) d.createObjectStore(s, { keyPath: "id" });
       if (!d.objectStoreNames.contains("settings")) d.createObjectStore("settings", { keyPath: "key" });
     };
-    r.onsuccess = () => { idb = r.result; idb.onversionchange = () => idb.close(); res(moveFromOldName().catch(() => {}).then(() => idb)); };
+    r.onsuccess = () => { idb = r.result; idb.onversionchange = () => idb.close(); res(idb); };
     r.onerror = () => rej(r.error);
     r.onblocked = () => rej(new Error("blocked"));
   });
-}
-// One-time move: if this browser has data saved under the app's old name and nothing under the new one,
-// copy it over, then remove the old copy. Opening the old name never creates it if it isn't there.
-function openIfExists(name) {
-  return new Promise((res) => {
-    let r;
-    try { r = indexedDB.open(name); } catch { res(null); return; }
-    r.onupgradeneeded = () => { try { r.transaction.abort(); } catch {} };
-    r.onsuccess = () => res(r.result);
-    r.onerror = (e) => { e.preventDefault?.(); res(null); };
-    r.onblocked = () => res(null);
-  });
-}
-async function moveFromOldName() {
-  const stores = ["vehicles", "fillups", "services", "settings"];
-  const counts = await Promise.all(stores.map((s) => reqP(idb.transaction(s).objectStore(s).count())));
-  if (counts.some((n) => n > 0)) return;
-  const old = await openIfExists(OLD_DB_NAME);
-  if (!old) return;
-  const have = stores.filter((s) => old.objectStoreNames.contains(s));
-  const data = {};
-  try { for (const s of have) data[s] = await reqP(old.transaction(s).objectStore(s).getAll()); }
-  finally { old.close(); }
-  if (have.length) {
-    await new Promise((res, rej) => {
-      const t = idb.transaction(have, "readwrite");
-      for (const s of have) for (const rec of data[s]) t.objectStore(s).put(rec);
-      t.oncomplete = () => res(); t.onerror = () => rej(t.error); t.onabort = () => rej(t.error);
-    });
-  }
-  indexedDB.deleteDatabase(OLD_DB_NAME);
 }
 const getAll = (store) => reqP(idb.transaction(store).objectStore(store).getAll());
 const byCreated = (a, b) => cmp(String(a.createdAt), String(b.createdAt)) || cmp(a.id, b.id);
