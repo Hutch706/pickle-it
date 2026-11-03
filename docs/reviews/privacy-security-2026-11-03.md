@@ -206,3 +206,82 @@ Plain language, short, true to how the app works. Host it at a permanent URL on 
 3. **Discreet Pantry rows for Health and Finance:** (A) rely on hiding jars (D8) and discreet task names, (B) add a per-jar "hide names on the Pantry" setting in v1, (C) B in v1.1. Recommend **A for v1, C later**, provided D8 is approved.
 4. **Export choice:** (A) one full backup with the warning, (B) add an "Include Health and Finance" checkbox. Recommend **A** for v1; B only if users ask.
 5. **Lawyer review:** one engagement before launch covering the privacy policy, terms and the name/trademark question (open-questions.md). Recommend **yes**; tell the lawyer about the Health jar specifically, since state health-data laws are the newest and least settled area.
+
+---
+
+## 2026-11-03: Phase 2 check
+
+Reviewer: privacy-security-reviewer. Scope: designs before build. Read: CLAUDE.md, docs/decisions.md, docs/specs/data-model.md 2.1, 2.3, 4.2, 4.4, 5, 6; docs/specs/v1-scope.md 4.9-4.11; docs/design/settings-option-c.html (CD1-CD4); and, read-only, data.js, app.js, sw.js, plus the Vehicle Maintenance App's data.js and sw.js as imported in commit e1b58e8. I did not see the old app's live deployed code; if it changed after e1b58e8, recheck the points marked *(old app)*.
+
+Context: the owner chose the shared github.io origin (decisions.md, Phase 1), which overrides M1 above. M1 is accepted, not fixed: a script bug in either app still exposes both until the old app's data is gone from users' browsers. The findings below assume that origin.
+
+### Verdicts in short
+- **Read-only copy (data-model 4.2, option B):** acceptable from a privacy view, user-started and previewed, provided P2-M1 is fixed. As written, one path can create the old app's database.
+- **Delete all data (data-model 6, v1-scope 4.10 AC 12, mockups CD1-CD4):** the scope (`pickle-it` / `pickle-it:` / `pickle-it-` only) is right and the two-step confirm plus "Export a backup first" meets the bar. Two gaps: old-app data stays behind and is re-offered (P2-M2), and clearing stores leaves a write-back race (P2-M3).
+- **Import checks (data-model 4.4):** close m2 and m3. Small gaps in P2-m5 and P2-m6.
+- **Old app's final notice:** list at the end of this section.
+
+### Blockers
+None.
+
+### Major
+
+**P2-M1. The copy's fallback check can create the old app's database.** data-model 4.2 step 1 falls back to `indexedDB.open("vehicle-maintenance-app")` with no version and aborts in `onupgradeneeded` if the database didn't exist. Opening a name that doesn't exist creates it. Whether aborting the upgrade then removes it is up to the browser, and Safari's IndexedDB has had bugs here. If an empty `vehicle-maintenance-app` at version 1 with no stores is left behind, the old app breaks in that browser *(old app)*: its `open(DB_NAME, 1)` (e1b58e8 data.js:105) finds version 1 already there, skips `onupgradeneeded`, so its stores are never created and every read fails. That breaks v1-scope 4.11 AC 5 ("never changes or deletes the old app's data").
+- **Fix:** detect with `indexedDB.databases()` only. Every browser Pickle It targets has it (Chrome/Android 71+, Safari 14+, Firefox 126+). If it's missing, don't offer the copy; CSV covers those users. Then open by name with no version only after the name is listed, so no upgrade can fire. This removes code as well.
+
+**P2-M2. Delete all data leaves the old app's copy of the same vehicle data, and the copy offer comes back.** Delete all clears `settings.vmaCopiedAt` (rightly), then shows first run. If `vehicle-maintenance-app` still exists in the browser, first run offers "Found Vehicle Maintenance App data. Copy it?" So someone who deletes to hand on or sell a phone leaves their vehicles, fill-up places and service history readable, and the next person is invited to load them. Once the old site is gone, no button anywhere deletes that data except clearing site data in browser settings, which most people can't find.
+- **Fix (owner decision P2-1 below):** in delete step 1 (CD2), when `indexedDB.databases()` lists `vehicle-maintenance-app`, say so and show an unticked checkbox: "Also delete Vehicle Maintenance App data saved in this browser." Ticked, it runs `indexedDB.deleteDatabase("vehicle-maintenance-app")` and removes `vma:` keys only. It's the user's explicit choice, so it's not the automatic deletion that was removed on 2026-11-03, but v1-scope 4.11 AC 5 and data-model 6 "Never touched" must be reworded to allow it. Without the box (option A), the dialog must at least say the old data stays and how to remove it, and the old app's final update must have its own delete (see the notice list).
+
+**P2-M3. Clear the database with `deleteDatabase("pickle-it")`, not store by store.** data-model 6 step 1 clears five named stores in one transaction to avoid a "blocked" state. Three problems:
+1. Write-back race (v1-scope 4.10 AC 12f): another tab that's mid-save, or that saves before it handles the BroadcastChannel message, writes into the cleared stores. The result is an orphan fill-up or log, or `lastChange`, that survives "delete all".
+2. The store list has to be kept up to date by hand. A store added later and missed here keeps its data quietly.
+3. Cleared records can remain in the browser's database files until compaction. Deleting the database removes the files, which matters when a phone is handed on.
+
+Today's code already makes every connection close itself on `versionchange` (data.js:117), so `deleteDatabase` won't stay blocked by Pickle It's own tabs. Their `idb` is closed, so a late save fails instead of writing back.
+- **Fix:** `indexedDB.deleteDatabase("pickle-it")`. Treat `onblocked` as "Close other Pickle It tabs to finish" and wait for success. Claim success only on `onsuccess`, then clear the `pickle-it:` keys, post `"wiped"` on the channel (other tabs `location.reload()` rather than `reload()`, so open dialogs are dropped), and reload. The schema comes back on the next `openDB()`. The exact name means it can't touch the old app's database. Keep v1-scope AC 12g: on error, say it failed and allow a retry.
+
+### Minor
+
+**P2-m1. Don't delete the caches.** data-model 6 step 3 deletes `pickle-it-` caches when online. I checked sw.js: it caches only same-origin GETs inside its scope, keyed by path with the query dropped, and the app never fetches user data (exports are blobs, which skip the service worker). The caches hold app files and nothing personal. Deleting them gains no privacy, and if the network is flaky (`navigator.onLine` is unreliable) the app can't reopen offline, which breaks v1-scope 4.10 AC 12e. The service worker registration holds no data either. **Fix:** drop step 3 and leave the registration. Say in the doc that caches and the registration hold no user data.
+
+**P2-m2. The delete copy in the mockups doesn't list everything.** CD1's hint and CD2's list name assets, tasks, fill-ups and history but leave out hour readings, shops/providers and settings (theme, palette, hidden jars), which v1-scope 12a lists. CD2's title is "Delete all data?"; the spec's "Delete all Pickle It data?" is better on a shared origin, because the old app's data isn't included unless P2-M2's box is ticked. CD2 also leaves out "can't be recovered by anyone". **Fix:** use the spec's title and list, and add a line about readings, shops and settings.
+
+**P2-m3. Smaller points in the delete flow.**
+- "Export a backup first" runs Export, so show the 4.9 AC 7 "isn't encrypted" line there too.
+- CD2's "Your last backup was 3 weeks ago" comes from `lastExport`, which is saved when export starts (app.js:914). On iOS the user can cancel the share sheet, so say "Last export started 3 weeks ago" or "Last export", not "backup".
+- After deleting, the success message (or CD4) should say: "Backups you exported are still in your files. Delete them there if you need to."
+- Collect `pickle-it:` keys into an array before removing them; removing while looping over `localStorage` by index skips keys.
+
+**P2-m4. Read as little as possible from the old database, and let go of it fast.**
+- Read `vehicles`, `fillups`, `services` and only `settings.get("shops")`, not `getAll` on `settings` (no need for `lastExport`, `lastChange` or anything else).
+- Set `onversionchange = () => db.close()` and close straight after the read, so Pickle It never blocks the old app's final update if that update bumps its version. *(old app)* Better still, the final update shouldn't change the old app's storage at all.
+- Make Merge the default in the copy preview. Replace there deletes Pickle It data the user may already have entered.
+- Treat the old database as untrusted input, like a file. data-model 4.2 step 3 already does: every record goes through the builders and the 4.4 checks. Keep that in the build; don't bypass it with direct `put`s.
+
+**P2-m5. The id pattern allows a leading `-`.** `^[A-Za-z0-9_~-]{1,60}$` blocks formula payloads (no `=`, `+`, `@`, `(`, `|`, `!`), but an id like `-A1` can still be read as a formula by Excel and come back changed after a re-save. **Fix:** `^[A-Za-z0-9_~][A-Za-z0-9_~-]{0,59}$`. Ids from `newId()`, library ids and the importer's `~` visit placeholders (data.js:555) all still match.
+
+**P2-m6. Small gaps in the import checks.**
+- `season` is a display label: cap it (for example 20 chars). It's already formula-guarded through `CSV_TEXT`.
+- Combination checks cover `schedule` rows only. Also reject `fillup` rows whose thing isn't in `vehicles`, `reading` rows and log `hours` on things outside `vehicles`/`home`, and `hours`/`odometer` on Health and Finance `thing` rows (data-model 2.3, 2.4a). Otherwise a crafted file can attach meter data to a person or household.
+- Optional, as before (m1): a row cap.
+
+**P2-m7. Keep each app's service worker out of the other's pages.** Service worker scope is a path, not an origin. If either app is ever served from the origin root (`hutch706.github.io/`), its service worker controls the other app's pages. Both must stay project sites under their own paths. Also note README.md:31 says `/pickle-it/` while distribution.md says `/pickle_it/`. Whichever path launches is permanent; release-manager should settle it.
+
+### m2 and m3 from the earlier review
+- **m2: closed in the design.** The allow-lists (`record_type`, `jar`, `every_unit`, `time_from`, `status`, yes/no), the number ranges with `NaN`/`Infinity`/negatives rejected, `thing` capped at 80, the date parser for `first_due`/`for_due`, unknown columns ignored, and reject-the-row-not-the-file all match. P2-m6 is extra hardening.
+- **m3: closed in the design.** Ids are checked on import with a stable remap, and `thing`/`season` join `CSV_TEXT`. Tighten the pattern per P2-m5. Verify both when built (qa fixture: an id of `=HYPERLINK("x")` and one of `-A1`; the export should show neither as is).
+
+### Old app's final notice: what it must tell users
+A final Vehicle Maintenance App update, before deletion. release-manager writes the copy. Builds on data-model 4.2's list:
+1. **On every screen, not dismissable for good:** "Vehicle Maintenance App is being replaced by Pickle It on <date>," with the link.
+2. **Export button in the banner**, plus the steps: in Pickle It, Settings → App settings → Import → Merge.
+3. **iPhone home-screen users:** "Pickle It can't see data saved inside the home-screen app. Export now." Android or same browser: "Pickle It can copy your data for you when you open it."
+4. **What happens to the data:** the site going away doesn't delete it from the browser, but nothing will be able to show or export it, and Safari may clear it.
+5. **How to delete it (new; ties to P2-M2):** a "Delete this app's data from this browser" button after the user has moved. It runs `deleteDatabase("vehicle-maintenance-app")`, removes `vma:` keys and its own caches, and nothing else. Never `localStorage.clear()`, `Clear-Site-Data` or "delete every cache": those would wipe Pickle It. Also warn that "Clear site data" in browser settings deletes **both** apps' data.
+6. **The final update mustn't change storage:** no `DB_VERSION` bump, no new stores, no migrations. So the copy (and P2-m4) keep working.
+7. **After deletion:** an installed old app is network-first and falls back to its cached copy when the server returns 404, so it keeps running the last version it saved. That's good (the export and delete buttons stay reachable), so make sure that last version is the one with the notice. If the owner instead puts a "this app has moved" page at the old address, it must return 200 and still include Export and Delete. Otherwise the service worker caches that page over the app and users lose their only export button.
+8. **Privacy policy:** Pickle It's policy (section 5 above) should mention the one-time copy: it reads the old app's data on this device only when the user taps, nothing leaves the device, and the old data isn't changed.
+
+### Needs a decision (owner), Phase 2
+- **P2-1. Old-app data in Delete all data (P2-M2).** (A) Pickle It only tells the user the old data stays and how to remove it; (B) step 1 adds an unticked "Also delete Vehicle Maintenance App data in this browser" box, which means rewording v1-scope 4.11 AC 5. Recommend **B**: after the old site is gone, Pickle It is the only app left that can delete that data, and it happens only on an explicit tick.
+- **P2-2. Read-only copy (data-model decision 1).** From a privacy view, **B (CSV plus copy) is acceptable** with P2-M1 and P2-m4 applied.
