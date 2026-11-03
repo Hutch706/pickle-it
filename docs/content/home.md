@@ -2,6 +2,8 @@
 
 Status: draft, 2026-11-03. Not yet a data file; that waits until docs/specs/data-model.md is approved.
 
+> **Sources checked 2026-11-03:** 19 citations opened. 11 confirmed, 7 replaced (the ENERGY STAR checklist page doesn't give the 3-month filter change; the CSIA FAQ and the Briggs & Stratton tune-up page are gone (HTTP 404); the NFPA smoke alarm page text couldn't be read (x2); the Toro ManualsLib page has no oil interval (x2)), 1 unsupported (Honda EU2200i: couldn't read the manual's schedule). Numbers marked **(no source found)**: riding mower 100 hours, generator 6 months / 100 hours. Dates and `remind` values are product proposals, not sourced numbers.
+
 ## How to read this
 - **Schedule** uses the data-model's terms:
   - `time {n, unit, from}`: `from: done` restarts when done; `from: calendar` stays on fixed dates every year.
@@ -10,7 +12,7 @@ Status: draft, 2026-11-03. Not yet a data file; that waits until docs/specs/data
 - **Things** (decided): the house is one thing ("Home"). **Each small engine is its own thing** ("Mower", "Snow blower", "String trimmer", "Generator") with its own hour reading. Tasks below are grouped by the thing they belong to.
 - **Seasons and dates:** Northern Hemisphere, temperate US climate. Each seasonal task has a proposed date (`firstDue` month and day for a calendar-yearly rule). Fallback if the owner rejects a date: the meteorological season start (Mar 1, Jun 1, Sep 1, Dec 1). Southern Hemisphere: shift 6 months.
 - **Machines without an hour meter:** every hours + time task also lists a **time-only option**. The add-task screen should offer it when the user says the machine has no hour meter.
-- **(unsure)** marks a number or date I couldn't confirm from a reputable source.
+- **(no source found)** marks a number no reputable source I could open supports. **(unsure)** marks a date or choice that is my proposal.
 - Intervals are starting suggestions. Owner's manuals for each appliance and engine come first.
 
 ## Home (the house)
@@ -20,7 +22,7 @@ Status: draft, 2026-11-03. Not yet a data file; that waits until docs/specs/data
 - Schedule: `time {n: 3, unit: month, from: done}`
 - Season: none (all year)
 - DIY or pro: DIY
-- Source: ENERGY STAR, check the filter every month (especially in winter and summer) and change it at least every 3 months: https://www.energystar.gov/saveathome/heating-cooling/maintenance-checklist
+- Source: ENERGY STAR, check the filter every month (especially in winter and summer) and, at a minimum, change it every 3 months: https://www.energystar.gov/saveathome/heating-cooling
 - Note: pets, allergies or heavy use mean more often. Users can set 1 or 2 months.
 
 ### 2. AC tune-up (spring)
@@ -44,7 +46,7 @@ Status: draft, 2026-11-03. Not yet a data file; that waits until docs/specs/data
 - Schedule: `time {n: 1, unit: year, from: calendar}`, season "Late summer"
 - Proposed date: **Aug 15** (before heating season; sweeps book up in fall) **(unsure: date is my pick)**
 - DIY or pro: pro (certified chimney sweep)
-- Source: NFPA 211, chimneys, fireplaces and vents inspected at least once a year; CSIA follows NFPA 211: https://csia.org/faq.html
+- Source: NFPA 211, chimneys, fireplaces and vents inspected at least once a year; CSIA follows NFPA 211 and quotes it: https://www.csia.org/homeowner-resources
 - Offer unchecked by default; many homes don't have one.
 
 ### 5. Test smoke and CO alarms
@@ -52,19 +54,19 @@ Status: draft, 2026-11-03. Not yet a data file; that waits until docs/specs/data
 - Schedule: `time {n: 1, unit: month, from: done}`
 - Season: none
 - DIY or pro: DIY (press the test button)
-- Source: NFPA 72, test alarms at least monthly (see NFPA smoke alarm guidance: https://www.nfpa.org/education-and-research/home-fire-safety/smoke-alarms).
+- Source: US Fire Administration, test smoke alarms every month: https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/smoke-alarms/. CPSC, test smoke and CO alarms monthly: https://www.cpsc.gov/Safety-Education/Safety-Education-Centers/Carbon-Monoxide-Information-Center/CO-Alarms
 
 ### 6. Replace smoke alarms
 - Why: sensors wear out; alarms should be replaced by age, even if they still beep on test.
 - Schedule: `time {n: 10, unit: year, from: done}`. The UI should ask for the **manufacture date** printed on the back and set `firstDue` = that date + 10 years.
 - DIY or pro: DIY (pro or electrician for hard-wired units, if unsure)
-- Source: NFPA, replace smoke alarms 10 years from the date of manufacture: https://www.nfpa.org/education-and-research/home-fire-safety/smoke-alarms
+- Source: US Fire Administration, replace smoke alarms 10 years from the manufacture date (alarms with sealed 10-year batteries: follow the manufacturer): https://www.usfa.fema.gov/prevention/home-fires/prepare-for-fire/smoke-alarms/
 
 ### 7. Replace CO alarms
 - Why: CO sensors have a set life; an expired one may not warn you.
-- Schedule: `time {n: 5, unit: year, from: done}` **(unsure)**. Better: ask for the **replace-by date** printed on the alarm and use that as `firstDue`.
+- Schedule: `time {n: 5, unit: year, from: done}` (source is dated; see below). Better: ask for the **replace-by date** printed on the alarm and use that as `firstDue`.
 - DIY or pro: DIY
-- Source: NFPA 72, replace when the end-of-life signal sounds or at the manufacturer's replacement date. Manufacturer lives vary (Kidde says 10 years: https://kidde.com/home-safety/en/us/support/replace-and-upgrade; other guidance says 5-7 years). 5 years is the shortest figure I found, chosen to err safe **(unsure)**.
+- Source: Kidde, replace CO alarms every 7 to 10 years depending on model (10 years for its alarms made since 2013, 7 before that), or when the end-of-life signal sounds: https://kidde.com/home-safety/en/us/support/replace-and-upgrade. CPSC said replace CO alarms every five years, but that release is from 2007: https://www.cpsc.gov/Newsroom/News-Releases/2008/When-Changing-Clocks-Back-to-Standard-Time-Check-Batteries-and-Age-of-Alarms-CPSC-Recommends-Replacing-Older-Alarms. 5 years errs safe but is likely early for current alarms; the printed replace-by date is better.
 
 ### 8. Flush water heater
 - Why: sediment builds up in the tank, which shortens its life and wastes energy.
@@ -79,7 +81,7 @@ Status: draft, 2026-11-03. Not yet a data file; that waits until docs/specs/data
 - Schedule: `time {n: 6, unit: month, from: calendar}`, season "Spring and fall"
 - Proposed dates: **May 1 and Nov 1** (`firstDue` on whichever comes next). Nov 1 is after most leaves fall in the north.
 - DIY or pro: either (ladder work; pro if it's two stories)
-- Source: AAA Northeast magazine, clean at least twice a year in spring and fall: https://magazine.northeast.aaa.com/?p=51202. Connecticut Insurance Dept., clear gutters before freezing: https://portal.ct.gov/cid/consumer-information-center/consumer-alerts/2023-consumer-alerts/october-11. Not a primary trade or government standard **(unsure: source strength)**.
+- Source: AAA Northeast magazine, clean gutters at least twice a year, in spring and fall: https://magazine.northeast.aaa.com/?p=51202. Connecticut Insurance Dept. lists gutter cleaning in fall maintenance, since debris freezes in gutters after the first frost: https://portal.ct.gov/cid/consumer-information-center/consumer-alerts/2023-consumer-alerts/october-11. Not a primary trade or government standard **(unsure: source strength)**.
 - Regional: heavy tree cover means more often; dry climates may need once a year. Pines drop needles year-round.
 
 ### 10. Winterize outdoor faucets (winter prep)
@@ -95,7 +97,7 @@ Status: draft, 2026-11-03. Not yet a data file; that waits until docs/specs/data
 - Schedule: `time {n: 1, unit: year, from: done}`
 - Season: none
 - DIY or pro: either (pro for long or rooftop runs)
-- Source: US Fire Administration clothes dryer fire safety flyer (keep the vent clear and undamaged): https://www.usfa.fema.gov/downloads/pdf/publications/clothes_dryer_fire_safety_flyer.pdf. The yearly interval comes from local fire departments (for example Floyd County, IN: https://floydcofirein.gov/safety/clothes-dryer-fire-safety/); other fire services say twice a year or every 3 months **(unsure: interval)**.
+- Source: US Fire Administration clothes dryer fire safety flyer (not cleaning dryer vents raises fire risk; check the vent isn't damaged, crushed or restricted): https://www.usfa.fema.gov/downloads/pdf/publications/clothes_dryer_fire_safety_flyer.pdf. The yearly interval: Floyd County (IN) Fire, clean the vent pipe once a year, or more often if clothes take longer to dry: https://floydcofirein.gov/safety/clothes-dryer-fire-safety/. A local fire service, not a national standard **(unsure: source strength)**.
 - Note: cleaning the lint screen after every load is a habit, not a scheduled task, so it's not in the library.
 
 ### 12. Clean refrigerator coils
@@ -112,15 +114,15 @@ Status: draft, 2026-11-03. Not yet a data file; that waits until docs/specs/data
 - Schedule: `hours {every: 50, remind: 5}` + `time {n: 1, unit: year, from: done}`
 - **Time-only option (no hour meter):** `time {n: 1, unit: year, from: calendar}`, season "Spring", proposed **Apr 1** (before the first mow).
 - DIY or pro: DIY
-- Source: Briggs & Stratton, change oil every 50 hours or every season (annually), whichever comes first; riding mowers every 100 hours or annually; new engines after the first 5 hours: https://www.briggsandstratton.com/en-gb/support/faqs/lawn-mower-oil-change
-- Notes: riding mower users should set `every: 100`. The 5-hour break-in change isn't in the default; a one-off custom task covers it. `remind: 5` is my product pick, not a sourced number.
+- Source: Briggs & Stratton, change oil every 50 hours of operation or every season; new engines after the first 5 hours; more often in tough conditions (wet grass, dust, heat, hills): https://www.briggsandstratton.com/en-gb/support/faqs/lawn-mower-oil-change. Their EXi engines need no oil changes, only top-ups.
+- Notes: the earlier draft said riding mowers can use `every: 100`. That page doesn't say so, and I couldn't open the Briggs store page said to list it **(no source found: 100 hours)**. Riding mower users should check their manual. The 5-hour break-in change isn't in the default; a one-off custom task covers it. `remind: 5` is my product pick, not a sourced number.
 
 ### 14. Store mower for winter
 - Why: untreated gas goes stale over the off-season and gums up the carburetor.
 - Schedule: `time {n: 1, unit: year, from: calendar}`, season "Fall"
 - Proposed date: **Nov 1** (after the last mow)
 - DIY or pro: DIY (add fuel stabilizer and run it, or run the tank dry, per the manual)
-- Source: Briggs & Stratton tune-up and storage guidance: https://briggsandstratton.com/na/en_us/support/maintenance-how-to/browse/tune-up-how-to.html. Owner's manual for the method.
+- Source: Briggs & Stratton, gas can begin to degrade in as little as 30 days; add fuel stabilizer and run the engine a few minutes, or (without stabilizer, or with alcohol-blend fuel) empty the tank and run the engine until it stops: https://www.briggsandstratton.com/en-us/support/maintenance-how-to/storing-your-equipment. Owner's manual for the method.
 - Regional: in the South, mowing can run into December or year-round; users can pause this task.
 
 ## Snow blower (its own thing)
@@ -130,14 +132,14 @@ Status: draft, 2026-11-03. Not yet a data file; that waits until docs/specs/data
 - Schedule: `time {n: 1, unit: year, from: calendar}`, season "Fall", proposed **Oct 15** (before the first snow). Optional `hours {every: <from manual>}`.
 - **Time-only is the default here** because I found no reputable hours figure that applies across brands **(unsure: hours)**. The owner's manual hour figure can be added as an hours rule.
 - DIY or pro: DIY
-- Source: Toro guidance, change engine oil at least once a year (and after the first few hours on a new machine), as summarized from Toro manuals on ManualsLib, e.g. https://www.manualslib.com/manual/1154103/Toro-38576.html?page=18 **(unsure: secondary copy of the manual)**.
+- Source: Toro SnowMaster 724/824 QXE operator's manual (on Toro's site), change the engine oil after the first 2 hours, then yearly: https://manuals.toro.com/257356/. One model; other brands and models may differ.
 
 ### 16. Store snow blower for summer
 - Why: stale fuel over summer is the most common reason a snow blower won't start in the first storm.
 - Schedule: `time {n: 1, unit: year, from: calendar}`, season "Spring"
 - Proposed date: **Apr 1**
 - DIY or pro: DIY (stabilize or drain fuel per the manual)
-- Source: Toro manuals, add fuel stabilizer on the last fill-up of the season and run the engine, or drain the tank (same source as 15).
+- Source: Toro SnowMaster manual (same as 15), add fuel stabilizer on the last refueling of the season and run the engine 10 minutes, then siphon the tank or run it until it stops; don't store fuel over the off-season without stabilizer.
 - Regional: snow belt and mountain areas may want May 1. Areas without snow won't own one.
 
 ## String trimmer (its own thing)
@@ -155,7 +157,7 @@ Status: draft, 2026-11-03. Not yet a data file; that waits until docs/specs/data
 - Schedule: `hours {every: 100, remind: 10}` + `time {n: 6, unit: month, from: done}`
 - **Time-only option (no hour meter):** `time {n: 6, unit: month, from: done}`
 - DIY or pro: DIY (portable); pro for standby (whole-house) generators
-- Source: Honda EU2200i owner's manual maintenance schedule, change oil every 6 months or 100 hours (first change at 1 month or 20 hours): https://www.manualslib.com/manual/2273617/Honda-Eu2200i.html?page=58. Other brands differ; this is one well-known model **(unsure: as a general default)**. `remind: 10` is my product pick.
+- Source: Honda EU2200i owner's manual, maintenance schedule on page 60 of this copy: https://www.manualslib.com/manual/2273617/Honda-Eu2200i.html?page=60. I couldn't read the schedule table cleanly; one extraction suggested every 3 months or 50 hours, which conflicts with the 6 months / 100 hours in this draft. I couldn't read Honda's own PDF either **(no source found: 6 months and 100 hours)**. Other brands differ. `remind: 10` is my product pick.
 - Regional: hurricane areas may want it before June 1 (start of the Atlantic hurricane season); cold areas before winter storms.
 
 Count: 18 tasks (12 house, 6 small engine). The v1-scope target is 15-25.

@@ -2,13 +2,15 @@
 
 Status: draft, 2026-11-03. Not yet in `data.js`. The data-file version waits until docs/specs/data-model.md is approved.
 
+> **Sources checked 2026-11-03:** 6 cited links opened. 1 confirmed (AAA, with wording corrected), 5 replaced (2 NHTSA pages blocked automated access (HTTP 403) so couldn't be checked, 1 USTMA page didn't give the interval, Counterman blocked access (HTTP 403), Tuffy is gone (HTTP 404)). 11 numbers have no reputable source and are marked **(no source found)**: oil 5,000 mi and 6 months, cabin filter 1 year, engine air filter 30,000 mi, brake fluid 30,000 mi and 2 years, transmission fluid 60,000 mi, spark plugs 60,000 mi, coolant 100,000 mi, battery check 6 months.
+
 ## How to read this
 - **Schedule** uses the data-model's terms (docs/specs/data-model.md 2.3, 3.2-3.4):
   - `miles {every, remind}`: odometer miles. Vehicles only.
   - `time {n, unit, from}`: `from: done` restarts when done; `from: calendar` stays on fixed dates.
   - Two rules on one task mean "whichever comes first" (only miles + time or hours + time are allowed).
 - **Every interval is a starting suggestion.** The app should show, once per vehicle: "These are general defaults. Your owner's manual has the right schedule for your car. Edit any task to match it." Manufacturers differ a lot (for example, many newer cars list oil changes at 7,500-10,000 miles with synthetic oil, and spark plugs at 100,000 miles).
-- **(unsure)** marks a number I couldn't confirm from a reputable source. Those are proposals for the owner to accept, change or drop.
+- **(no source found)** marks a number no reputable source I could open supports. Those are marked defaults for the owner to accept, change or drop.
 - Mileage values for items 1-8 are today's `STANDARD_SCHEDULE` (unchanged), so existing users see no surprise. Time limits are new (allowed by the "miles + time" decision).
 - Season: none of these are seasonal by default. Vehicle tasks run from last done.
 
@@ -18,68 +20,68 @@ Status: draft, 2026-11-03. Not yet in `data.js`. The data-file version waits unt
 - Why: old oil stops protecting the engine; this is the most common cause of avoidable engine wear.
 - Schedule: `miles {every: 5000, remind: 1000}` + `time {n: 6, unit: month, from: done}`
 - DIY or pro: either
-- Source: owner's manual. 5,000 miles is today's `STANDARD_SCHEDULE` value. The 6-month time limit is a common manual pattern for low-mileage driving, but I didn't find a reputable cross-make source for either number **(unsure: both)**.
+- Source: owner's manual. 5,000 miles is today's `STANDARD_SCHEDULE` value. The 6-month time limit is a common manual pattern for low-mileage driving. Neither number has a reputable cross-make source **(no source found: both)**.
 
 ### 2. Tire rotation
 - Why: rotating evens out wear so tires last longer and grip evenly.
 - Schedule: `miles {every: 5000, remind: 1000}`
 - DIY or pro: either (most shops do it with an oil change)
-- Source: NHTSA, "rotate your tires every 5,000 to 8,000 miles" if the manufacturer recommends rotation: https://www.nhtsa.gov/press-releases/june-tire-safety-month. US Tire Manufacturers Association: follow the manual, else 5,000-8,000 miles: https://www.ustires.org/ntswtoolkit. 5,000 sits at the low end of that range.
+- Source: US Tire Manufacturers Association, follow the owner's manual; if it gives no period, every 5,000 to 8,000 miles: https://www.ustires.org/tire-care-essentials. Florida Highway Safety and Motor Vehicles, rotate at least every 5,000 miles: https://www.flhsmv.gov/pdf/consumer/TireSafetyRackCardENGLISH.pdf. 5,000 sits at the low end of the USTMA range.
 
 ### 3. Check tire pressure and tread
-- Why: underinflation is the leading cause of tire failure, and all tires slowly lose air.
+- Why: underinflated tires build up heat and stress, which causes uneven wear and internal damage, and all tires slowly lose air.
 - Schedule: `time {n: 1, unit: month, from: done}`
 - DIY or pro: DIY (gauge, tires cold; use the door-jamb label, not the number on the tire)
-- Source: NHTSA tires page, check all tires including the spare at least once a month: https://www.nhtsa.gov/vehicle-safety/tires
+- Source: US Tire Manufacturers Association, check pressure at least once a month when tires are cold, and check the spare too: https://www.ustires.org/tire-care-essentials. Florida HSMV also says check pressure and the spare monthly (same card as task 2).
 - Note: this is the only monthly vehicle task. If the owner thinks it's too noisy for the Pantry, drop it or default it to paused.
 
 ### 4. Cabin air filter
 - Why: keeps dust and pollen out of the cabin and lets the AC and defroster blow properly.
-- Schedule: `miles {every: 15000, remind: 1000}` + `time {n: 1, unit: year, from: done}` **(unsure: time limit)**
+- Schedule: `miles {every: 15000, remind: 1000}` + `time {n: 1, unit: year, from: done}` **(no source found: time limit)**
 - DIY or pro: DIY on most cars (often behind the glovebox)
-- Source: owner's manual. Mileage is today's default; I found no single reputable figure, and some manuals don't list this filter at all **(unsure)**.
+- Source: owner's manual. Car Care Council, replace every 12,000 to 15,000 miles or per the owner's manual, more often where the air is smoky or dusty: https://www.carcare.org/2020/11/wildfires-a-serious-concern-for-vehicles-passengers/. 15,000 (today's default) sits at the top of that range. Some manuals don't list this filter at all.
 
 ### 5. Engine air filter
 - Why: a clogged filter starves the engine of air.
 - Schedule: `miles {every: 30000, remind: 5000}`
 - DIY or pro: DIY on most cars
-- Source: owner's manual. The Car Care Council's general guidance is to inspect it at oil changes rather than give a fixed interval (as reported by Counterman: https://www.counterman.com/maintenance-minded/). 30,000 is today's default **(unsure)**; dusty or unpaved roads need it sooner.
+- Source: owner's manual. Car Care Council, inspect at each oil change and replace annually or when it shows contamination: https://www.carcare.org/2020/11/wildfires-a-serious-concern-for-vehicles-passengers/. 30,000 miles is today's default and doesn't match that guidance **(no source found)**; dusty or unpaved roads need it sooner.
 
 ### 6. Brake fluid
 - Why: brake fluid absorbs water over time, which lowers its boiling point and can corrode parts.
-- Schedule: `miles {every: 30000, remind: 5000}` + `time {n: 2, unit: year, from: done}` **(unsure: both numbers)**
+- Schedule: `miles {every: 30000, remind: 5000}` + `time {n: 2, unit: year, from: done}` **(no source found: both numbers)**
 - DIY or pro: pro
-- Source: owner's manual. Many manuals give a time-based interval (2-3 years) for brake fluid, which is why a time limit fits here, but I didn't confirm a single figure **(unsure)**.
+- Source: owner's manual. Many manuals give a time-based interval (2-3 years) for brake fluid, which is why a time limit fits here, but I didn't find a reputable cross-make figure **(no source found)**.
 
 ### 7. Transmission fluid
 - Why: worn fluid can lead to rough shifting and costly transmission repairs.
 - Schedule: `miles {every: 60000, remind: 5000}`
 - DIY or pro: pro
-- Source: owner's manual. Intervals vary widely, and some automatics are listed as "lifetime" fluid **(unsure)**.
+- Source: owner's manual. Intervals vary widely, and some automatics are listed as "lifetime" fluid. 60,000 is today's default **(no source found)**.
 
 ### 8. Spark plugs
 - Why: worn plugs cause misfires, rough idle and worse fuel economy.
 - Schedule: `miles {every: 60000, remind: 5000}`
 - DIY or pro: pro (DIY on some engines)
-- Source: owner's manual. Many modern engines with iridium or platinum plugs list about 100,000 miles **(unsure)**. Not relevant for electric vehicles.
+- Source: owner's manual. Many modern engines with iridium or platinum plugs list about 100,000 miles. 60,000 is today's default **(no source found)**. Not relevant for electric vehicles.
 
 ### 9. Engine coolant
 - Why: old coolant stops protecting against freezing, overheating and corrosion.
 - Schedule: `miles {every: 100000, remind: 5000}`
 - DIY or pro: pro
-- Source: owner's manual. Many manuals also give a time limit (often in years) for long-life coolant; I didn't add one because figures vary by make **(unsure)**.
+- Source: owner's manual. Many manuals also give a time limit (often in years) for long-life coolant; I didn't add one because figures vary by make. 100,000 is my proposal **(no source found)**.
 
 ### 10. Wiper blades
 - Why: worn blades streak and smear, which matters most in rain and snow.
 - Schedule: `time {n: 6, unit: month, from: done}`
 - DIY or pro: DIY
-- Source: car-care guidance commonly says about every six months, or sooner when they streak or chatter (for example, Tuffy citing Car Care Council guidance: https://www.tuffy.com/car_care_news/basic-car-care-greatly-improves-safety-and-reliability). Trade-press source, not a manufacturer **(unsure)**.
+- Source: Car Care Council, check and change wiper blades about every six months: https://www.carcare.org/2020/10/motorist-checklist-for-fall-car-care-month-in-october/. Heat, sun and winter weather wear them faster.
 
 ### 11. Battery check
 - Why: batteries usually fail without warning; a quick test catches a weak one before it strands you.
-- Schedule: `time {n: 6, unit: month, from: done}`
+- Schedule: `time {n: 6, unit: month, from: done}` **(no source found)**
 - DIY or pro: pro test (free at many auto parts stores and repair shops)
-- Source: AAA, average battery life is 3-5 years; schedule inspections at least once every six months, and test regularly after the battery hits three years: https://www.aaa.com/autorepair/articles/when-to-replace-your-cars-battery
+- Source: AAA, batteries typically last three to five years; have it checked at every oil change or tune-up, and test it yearly after three years: https://www.aaa.com/autorepair/articles/when-to-replace-your-cars-battery. Car Care Council, test the battery every fall: https://www.carcare.org/2020/10/motorist-checklist-for-fall-car-care-month-in-october/. Neither says every six months; both point to yearly.
 - Regional: heat shortens battery life; cold exposes weak batteries. A good fall reminder in cold regions.
 
 ### 12. Registration renewal

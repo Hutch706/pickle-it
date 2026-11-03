@@ -2,6 +2,8 @@
 
 Status: draft, 2026-11-03. Not yet a data file.
 
+> **Sources checked 2026-11-03:** 4 citations opened. 2 confirmed (FTC credit reports, with wording corrected; HealthCare.gov open enrollment), 2 replaced (the IRS estimated-taxes and filing pages don't list the dates). No unsupported dates. The 6-month auto policy term stays **(unsure)**; it comes from the user's policy, not a default.
+
 ## Ground rules (from docs/decisions.md, 2026-11-03 Phase 1)
 - **Money deadlines only, no amounts.** Tasks are names and dates. No amounts, account numbers or passwords.
 - **Not financial or tax advice.** The app should show, in the Finance setup screen: "These are date reminders, not financial or tax advice. Dates shown are common US deadlines; check your own bills, policies and the IRS for yours."
@@ -20,7 +22,7 @@ Status: draft, 2026-11-03. Not yet a data file.
   - "Estimated tax: Q3", proposed **Sep 15**
   - "Estimated tax: Q4", proposed **Jan 15**
 - DIY or pro: either (yourself or a tax preparer)
-- Source: IRS, estimated tax due dates and Form 1040-ES: https://www.irs.gov/businesses/small-businesses-self-employed/estimated-taxes
+- Source: IRS, payment periods and due dates (Apr 15, Jun 15, Sep 15, Jan 15 of the next year), and the next-business-day rule: https://www.irs.gov/faqs/estimated-tax/individuals/individuals-2
 - Why four tasks, not one: the gaps are uneven (2, 3, 4 and 3 months), so one repeating rule can't hit all four dates. **For data-architect:** confirm this is the intended way, or consider a "list of yearly dates" rule later.
 - Caveat: when a date falls on a weekend or legal holiday, the IRS moves it to the next business day (for example Jan 15, 2028 is a Saturday). The app's fixed dates won't shift; the setup note should say so **(known gap)**.
 - Offer unchecked by default; most W-2 employees don't pay estimated tax.
@@ -29,7 +31,7 @@ Status: draft, 2026-11-03. Not yet a data file.
 - Why: the federal filing deadline; filing late can mean penalties.
 - Schedule: `time {n: 1, unit: year, from: calendar}`, proposed **Apr 15**
 - DIY or pro: either
-- Source: IRS: https://www.irs.gov/filing (individual returns are generally due April 15; same weekend/holiday rule as above).
+- Source: IRS, calendar-year filers file by April 15; if the 15th is a Saturday, Sunday or legal holiday, the due date moves to the next business day: https://www.irs.gov/filing/individuals/when-to-file
 - Regional: some states have different filing dates; disaster areas sometimes get IRS extensions.
 
 ### 6. Insurance renewal
@@ -50,13 +52,13 @@ Status: draft, 2026-11-03. Not yet a data file.
 - Schedule: `time {n: 1, unit: year, from: done}`
 - Season: none
 - DIY or pro: DIY
-- Source: FTC, free credit reports from all three bureaus are now available every week at AnnualCreditReport.com, the only federally authorized site: https://consumer.ftc.gov/consumer-alerts/2023/10/you-now-have-permanent-access-free-weekly-credit-reports. Yearly is a minimum reminder; users can check more often.
+- Source: FTC, Equifax, Experian and TransUnion have permanently extended free weekly credit reports through AnnualCreditReport.com (other sites may charge or be fraudulent): https://consumer.ftc.gov/consumer-alerts/2023/10/you-now-have-permanent-access-free-weekly-credit-reports. Yearly is a minimum reminder; users can check more often.
 
 Count: 8 tasks (counting the four quarterly tax tasks separately). The v1-scope target is 5-10.
 
 ## Optional (offer unchecked; regional)
 - **Property tax due:** `time {n: 1, unit: year, from: calendar}` or `n: 6, unit: month` for areas billed twice a year. Dates are set by the county or town; no default date is safe. Source: your local tax collector. Renters skip it. Many homeowners pay through their mortgage escrow and don't need it.
-- **Health insurance open enrollment:** `time {n: 1, unit: year, from: calendar}`, proposed **Nov 1**. HealthCare.gov open enrollment generally runs Nov 1-Jan 15, with Dec 15 the deadline for coverage from Jan 1; some state marketplaces differ: https://www.healthcare.gov/blog/mark-open-enrollment-dates-on-your-calendar. Employer plans and Medicare have their own windows **(unsure: varies by plan)**.
+- **Health insurance open enrollment:** `time {n: 1, unit: year, from: calendar}`, proposed **Nov 1**. HealthCare.gov open enrollment starts Nov 1 and ends Jan 15, with Dec 15 the deadline for coverage from Jan 1 (confirmed for 2027 coverage). Some state marketplaces set their own dates (my note; this page doesn't say): https://www.healthcare.gov/blog/mark-open-enrollment-dates-on-your-calendar. Employer plans and Medicare have their own windows **(unsure: varies by plan)**.
 
 ## Left out on purpose
 - Anything with amounts (bills, budgets, balances): out of v1 per the decision.
