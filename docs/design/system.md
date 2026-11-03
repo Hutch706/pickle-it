@@ -117,7 +117,7 @@ Tapping the row opens its quick actions: Done (primary), Skip ("Skip this time" 
 | Estimate passed or 0 left | `Due now` | "Due now. …add a reading to update it." |
 | No reading (miles or hours) | `Add a reading` (accent) | "No hour reading yet. Add a reading." |
 
-A date is estimated only when the latest reading is under 90 days old and two readings are 30+ days apart; otherwise the no-estimate text shows. The amount and the date are two no-wrap chunks, so a long value breaks between them, never inside one. Units: "mi", and "hr" for every amount (data-model 3.3a). The year shows only outside the current year.
+A date is estimated only when the latest reading is under 90 days old and two readings are 30+ days apart; otherwise the no-estimate text shows. The amount and the date are two no-wrap chunks, so a long value breaks between them, never inside one. Units: "mi", and "hr" for every amount (data-model 3.3a). The year shows on dates more than about 6 months out (decided 2026-11-03), e.g. "Jun 3, 2027".
 
 **Overdue.** Never shown by color alone: tinted row, plus a badge with a warning-triangle icon and the word "Overdue", plus words in the due text.
 
