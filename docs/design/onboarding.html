@@ -1,0 +1,238 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Onboarding</title><style>
+:root{--bg:#f2f4f0;--surface:#fff;--ink:#1a221c;--muted:#5d6a60;--line:#d8ded6;--accent:#2f6b3f;--accent-ink:#fff;--display-fg:#c8e66a;
+--ok:#1f7a5a;--ok-bg:#e1f1e8;--wait:#85600a;--wait-bg:#f8eed3;--err:#b3261e;--err-bg:#fbe9e7;--err-ink:#fff;--line-strong:#7a867c;
+--font-display:"Avenir Next Condensed","Bahnschrift SemiCondensed","Bahnschrift","Roboto Condensed","sans-serif-condensed","Arial Narrow",system-ui,sans-serif;
+--font-body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--font-num:ui-monospace,"SF Mono",Menlo,Consolas,"Roboto Mono",monospace;color-scheme:light}
+/* Dark tokens included so the mock respects system dark mode. --err-ink and --line-strong are PROPOSED new tokens (see settings-options.md). */
+@media (prefers-color-scheme:dark){:root{--bg:#0f140f;--surface:#182019;--ink:#e5ece5;--muted:#9aaa9c;--line:#2a362c;--accent:#7cc48d;--accent-ink:#0c140e;
+--ok:#86d6b0;--ok-bg:#163126;--wait:#f0c46a;--wait-bg:#382b0e;--err:#ff8a80;--err-bg:#3b1714;--err-ink:#1a0b0a;--line-strong:#6f7f72;color-scheme:dark}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 var(--font-body)}
+.page{padding:24px 16px 64px;max-width:1800px;margin:0 auto}
+.page>header{max-width:760px;display:grid;gap:8px;margin-bottom:28px}
+.page>header p{margin:0;color:var(--muted)}
+.frames{display:flex;flex-wrap:wrap;gap:36px 28px;align-items:flex-start}
+figure{margin:0;display:grid;gap:10px;width:390px;max-width:100%}
+figcaption{font-size:14px;color:var(--muted)}figcaption b{color:var(--ink);font-family:var(--font-display);font-size:17px;margin-right:6px}
+.phone{width:390px;max-width:100%;background:var(--bg);border:1px solid var(--line-strong);border-radius:28px;overflow:hidden;position:relative;display:flex;flex-direction:column;min-height:640px}
+.phone.w320{width:320px}
+.scr{padding:16px 16px 28px;display:grid;gap:18px;align-content:start;flex:1}
+h1{font-family:var(--font-display);font-weight:700;font-size:30px;line-height:1.1;margin:0}
+h2{font-family:var(--font-display);font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin:0}
+h3{font-family:var(--font-display);font-size:20px;margin:0}
+.eyebrow{font-family:var(--font-display);font-weight:700;letter-spacing:.12em;font-size:13px;color:var(--accent);margin:0}
+.sub{color:var(--muted);margin:4px 0 0;font-size:15px}.hint{color:var(--muted);font-size:14px;margin:0}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ic{width:22px;height:22px;flex:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:14px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+button,a.btnlike{font:inherit;cursor:pointer}
+.iconbtn{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);color:var(--ink)}
+.back{display:inline-flex;align-items:center;gap:2px;min-height:44px;padding:0 8px 0 0;color:var(--accent);font-weight:600;text-decoration:none;border:0;background:none}
+.save{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;font-family:var(--font-display);font-weight:700;font-size:19px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:12px 16px;width:100%}
+.btn2{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;font-family:var(--font-display);font-weight:700;font-size:18px;background:none;color:var(--ink);border:1px solid var(--line-strong);border-radius:10px;padding:12px 16px;width:100%}
+.btn2.danger{color:var(--err);border-color:var(--err)}
+.save.danger{background:var(--err);color:var(--err-ink)}
+.save:disabled{opacity:.45;cursor:not-allowed}
+.small{min-height:44px;font-size:16px;width:auto;padding:8px 14px}
+.danger-link{background:none;border:0;color:var(--err);font-weight:600;min-height:44px;padding:0;justify-self:start;display:inline-flex;align-items:center;gap:6px}
+label{display:grid;gap:4px;font-size:14px;font-weight:500;color:var(--muted)}
+input[type=text],input[type=number],input[type=date],select{font:inherit;font-size:17px;color:var(--ink);background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:10px 12px;width:100%;min-height:46px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.tabs.three{grid-template-columns:repeat(3,1fr)}.tabs.four{grid-template-columns:repeat(4,1fr)}
+.tab{font-family:var(--font-display);font-weight:700;font-size:17px;background:none;color:var(--muted);border:0;border-radius:8px;min-height:44px;padding:8px 4px}
+.tab[aria-selected=true],.tab[aria-pressed=true],.tab[aria-checked=true]{background:var(--accent);color:var(--accent-ink)}
+.strip{display:flex;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow-x:auto;scrollbar-width:none}
+.strip .tab{flex:none;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;font-size:16px}
+.strip .tab .ic{width:18px;height:18px}
+.optlabel{font-size:14px;font-weight:500;color:var(--muted)}
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.sw{display:grid;justify-items:center;gap:4px;min-height:64px;padding:6px 2px;background:none;border:1px solid transparent;border-radius:10px;color:var(--ink);font-size:13px;font-weight:600}
+.sw i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;border:1px solid rgba(0,0,0,.2)}
+.sw[aria-checked=true]{border-color:var(--ink);background:var(--bg)}
+.sw .ic{width:18px;height:18px}
+.alert{display:flex;gap:10px;background:var(--wait-bg);color:var(--wait);border-radius:10px;padding:12px 14px;font-size:15px;font-weight:500}
+.alert.bad{background:var(--err-bg);color:var(--err)}
+.alert p{margin:0}
+details.how{border-top:1px solid var(--line)}details.how summary{min-height:44px;display:flex;align-items:center;font-weight:600;cursor:pointer}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;color:var(--ink);font-size:16px;font-weight:500;border-top:1px solid var(--line)}
+.toggle:first-of-type{border-top:0}
+.sw-ui{width:50px;height:30px;border-radius:15px;background:var(--line-strong);position:relative;flex:none}
+.sw-ui::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:left .1s}
+[aria-checked=true] .sw-ui{background:var(--accent)}[aria-checked=true] .sw-ui::after{left:23px}
+.toggle button{all:unset;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:48px;cursor:pointer}
+.toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.state{font-size:13px;color:var(--muted);margin-left:auto;margin-right:8px}
+.list{display:grid;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.arow{display:grid;grid-template-columns:40px 1fr auto;gap:2px 12px;align-items:center;min-height:64px;padding:10px 12px 10px 14px;border-top:1px solid var(--line);color:var(--ink);text-decoration:none}
+.arow:first-child{border-top:0}
+.arow .av{grid-row:1/span 2;width:40px;height:40px;border-radius:12px;background:var(--bg);color:var(--accent);display:grid;place-items:center}
+.arow .nm{font-weight:600;min-width:0;overflow-wrap:anywhere}
+.arow .mt{grid-column:2;font-size:14px;color:var(--muted)}
+.arow .mt b{font-weight:600;color:var(--ink)}.arow .mt b.over{color:var(--err)}
+.arow .ch{grid-column:3;grid-row:1/span 2;color:var(--muted)}
+.trow{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;min-height:64px;padding:10px 14px;border-top:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.trow:first-child{border-top:0}
+.trow .nm{font-weight:600}.trow .sc{grid-column:1;font-size:14px;color:var(--muted)}
+.trow .due{white-space:nowrap;grid-column:2;grid-row:1/span 2;text-align:right;font-family:var(--font-num);font-variant-numeric:tabular-nums;font-size:14px;font-weight:600}
+.trow .due small{display:block;font-family:var(--font-body);font-weight:500;color:var(--muted);font-size:12px}
+.trow .due.over{color:var(--err)}
+.trow.over{background:color-mix(in srgb,var(--err-bg) 60%,transparent)}
+.sechead{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.grp summary{list-style:none;display:flex;align-items:center;gap:10px;min-height:48px;cursor:pointer}
+.grp summary::-webkit-details-marker{display:none}
+.grp summary h2{flex:1}.grp summary .cnt{font-size:14px;color:var(--muted);font-weight:600}
+.grp summary .ic{transition:transform .15s;color:var(--muted)}.grp[open] summary .ic{transform:rotate(90deg)}
+.grp{display:grid;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{flex:none;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-weight:600;font-size:15px;display:inline-flex;align-items:center;gap:6px}
+.chip .n{font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}.chip[aria-pressed=true] .n{color:inherit}
+.search{position:relative}.search .ic{position:absolute;left:12px;top:12px;color:var(--muted)}.search input{padding-left:42px}
+.reading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.reading .v{font-family:var(--font-num);font-size:22px;font-weight:600}.reading .k{font-size:13px;color:var(--muted)}
+.empty{display:grid;gap:12px;justify-items:center;text-align:center;padding:28px 16px}
+.empty .big{width:72px;height:72px;color:var(--accent)}
+.empty p{margin:0}.empty .lead{font-family:var(--font-display);font-size:22px;font-weight:700}
+.addgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.addgrid .btn2{flex-direction:column;font-size:16px;min-height:76px}
+.note{font-size:13px;color:var(--muted);border-left:3px solid var(--line-strong);padding:2px 0 2px 10px;margin:0}
+/* Pantry entry + tab bar */
+.due{display:grid;gap:8px}
+.dbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.dbox>.hd{display:flex;justify-content:space-between;align-items:center;min-height:48px;padding:0 14px;font-family:var(--font-display);font-weight:700;font-size:18px}
+.dbox>.hd span{font-family:var(--font-body);font-size:14px;color:var(--muted);font-weight:600}
+.drow{display:grid;grid-template-columns:22px 1fr auto;gap:0 10px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);font-size:15px}
+.drow .ic{width:20px;height:20px;color:var(--muted)}.drow small{display:block;color:var(--muted);font-size:13px}
+.drow .w{font-weight:600;font-size:14px;text-align:right}.drow .w.over{color:var(--err)}
+.tb{margin-top:auto;border-top:1px solid var(--line);background:var(--surface)}
+.tb-in{display:grid;grid-template-columns:1.15fr 1px repeat(4,1fr);height:68px;align-items:center}
+.tb a{position:relative;display:grid;justify-items:center;align-content:center;gap:2px;min-height:56px;color:var(--muted);text-decoration:none;font-size:12px;font-weight:600;min-width:0}
+.tb a>span:not(.vh){max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
+.tb .jar{width:30px;height:30px}
+.tb .pansq{width:46px;height:40px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.18);margin-top:-6px}
+.tb .pan[aria-current=page]{color:var(--accent)}
+.tb .div{width:1px;height:36px;background:var(--line-strong)}
+.tb .dot{position:absolute;top:6px;left:calc(50% + 7px);width:10px;height:10px;border-radius:50%;background:var(--err);border:2px solid var(--surface)}
+.tb.big-text a{font-size:20px}
+/* Dialog mock */
+.dim{background:color-mix(in srgb,#000 45%,var(--bg))}
+.dlg{margin:auto 12px 12px;background:var(--surface);border-radius:18px;padding:20px 18px;display:grid;gap:14px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.dlg h2{color:var(--ink);text-transform:none;letter-spacing:0;font-size:24px}
+.dlg ul{margin:0;padding-left:20px;color:var(--ink);font-size:15px}
+.steps{display:flex;gap:6px;margin:0;padding:0;list-style:none}.steps li{flex:1;height:4px;border-radius:2px;background:var(--line)}.steps li.on{background:var(--err)}
+.mono{font-family:var(--font-num);font-weight:700;letter-spacing:.06em}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ===== Added for pantry / jars / onboarding (system.md). Same tokens as settings-option-c.html ===== */
+:root{--display-bg:#141a15;--run:#b5562a}
+@media (prefers-color-scheme:dark){:root{--display-bg:#070a07;--run:#ff9a6b}}
+svg.ic,svg.jar,svg.big{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.big{width:72px;height:72px;color:var(--accent)}
+.phone.tall{min-height:780px}
+.pend{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--wait);background:var(--wait-bg);border:1px dashed var(--wait);border-radius:6px;padding:2px 8px;width:max-content;max-width:100%;line-height:1.35}
+figcaption .pend{margin-top:6px}
+/* Due box */
+.boxes{display:grid;gap:10px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.box>summary{list-style:none;display:flex;align-items:center;gap:10px;min-height:52px;padding:4px 14px;cursor:pointer}
+.box>summary::-webkit-details-marker{display:none}
+.box>summary .t{flex:1;display:grid}
+.box>summary h2{font-size:19px;letter-spacing:.01em;text-transform:none;color:var(--ink)}
+.box>summary .rng{font-size:13px;color:var(--muted)}
+.cnt{min-width:30px;height:28px;padding:0 9px;border-radius:14px;background:var(--bg);color:var(--ink);font-weight:700;font-size:14px;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.box>summary .chev{color:var(--muted);transition:transform .15s}
+.box[open]>summary .chev{transform:rotate(180deg)}
+.dl{list-style:none;margin:0;padding:0}
+.none{border-top:1px solid var(--line);padding:14px;color:var(--muted);font-size:15px;margin:0}
+/* Due row */
+.dr{border-top:1px solid var(--line)}
+.dr.over{background:color-mix(in srgb,var(--err-bg) 60%,var(--surface))}
+.drb{all:unset;box-sizing:border-box;display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:0 10px;align-items:center;width:100%;min-height:60px;padding:10px 14px;cursor:pointer}
+.drb:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+.ji{width:36px;height:36px;border-radius:10px;background:var(--bg);color:var(--accent);display:grid;place-items:center}
+.ji .ic{width:20px;height:20px}
+.tx{min-width:0;display:grid}.tx b{font-weight:600;overflow-wrap:anywhere}.tx small{color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+.w{display:grid;justify-items:end;text-align:right;gap:3px;font-family:var(--font-num);font-variant-numeric:tabular-nums;font-size:14px;font-weight:600;max-width:150px}
+.w>span[aria-hidden]{display:flex;flex-wrap:wrap;justify-content:flex-end;column-gap:.35em}
+.w i{font-style:normal;white-space:nowrap}
+.w .ask{color:var(--accent);font-family:var(--font-body)}
+.dr.over .w{color:var(--err)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-body);font-size:12px;font-weight:700;border-radius:6px;padding:1px 6px;white-space:nowrap}
+.badge .ic{width:14px;height:14px}
+.badge.err{color:var(--err);background:var(--err-bg)}.badge.wait{color:var(--wait);background:var(--wait-bg)}.badge.ok{color:var(--ok);background:var(--ok-bg)}.badge.mut{color:var(--muted);background:var(--bg)}
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 14px}
+.act{min-height:52px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font:inherit;font-weight:600;font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px;cursor:pointer}
+.act.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.act .ic{width:18px;height:18px}
+.more{border-top:1px solid var(--line);padding:12px 14px 14px;display:grid;gap:10px}
+.more p{margin:0;font-size:15px}
+.gapm{border-top:1px dashed var(--line-strong);padding:6px 14px;font-size:12px;color:var(--muted);text-align:center;margin:0}
+/* Tab bar states */
+.tb .pan{color:var(--muted)}.tb .pan[aria-current=page]{color:var(--accent);font-weight:800}
+.tb .pan:not([aria-current]) .pansq{background:var(--surface);color:var(--accent);border:2px solid var(--accent);box-shadow:none}
+.jar .lid,.jar .body{fill:none}
+.tb a[aria-current=page]:not(.pan){color:var(--accent);font-weight:800}
+.tb a[aria-current=page] .jar .lid,.tb a[aria-current=page] .jar .body{fill:var(--accent)}
+.tb a[aria-current=page] .jar .in{stroke:var(--accent-ink)}
+.tb-in.three{grid-template-columns:1.15fr 1px repeat(3,1fr)}
+.tb .dot{top:4px;left:calc(50% + 8px);width:12px;height:12px}
+/* Overlays */
+.ov{position:absolute;inset:0;background:rgba(0,0,0,.45);display:flex;flex-direction:column;justify-content:flex-end;z-index:2}
+.toast{position:absolute;left:12px;right:12px;bottom:80px;background:var(--ink);color:var(--bg);border-radius:12px;padding:6px 6px 6px 14px;display:flex;align-items:center;gap:10px;font-size:15px;z-index:2}
+.toast p{margin:0;flex:1}
+.toast button{min-height:44px;min-width:64px;background:none;border:0;color:var(--bg);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+/* Jars */
+.bigbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bigbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:76px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:12px;padding:14px 8px;font-family:var(--font-display);font-weight:700;font-size:18px;cursor:pointer}
+.bigbtn .ic{width:26px;height:26px}
+.thg{background:var(--surface)}.thg+.thg{border-top:1px solid var(--line)}
+.thg .arow{border-top:0}
+.rd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px 12px 66px;font-size:14px;color:var(--muted)}
+.rd b{font-family:var(--font-num);color:var(--ink)}
+.display{background:var(--display-bg);color:var(--display-fg);border-radius:8px;padding:10px 14px;font-family:var(--font-num);font-variant-numeric:tabular-nums;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:17px}
+.display span:nth-child(odd){opacity:.75;font-size:12px;letter-spacing:.06em;text-transform:uppercase;align-self:center}
+.display span:nth-child(even){text-align:right;font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{display:grid;gap:2px}.stat .k{font-size:13px;color:var(--muted)}.stat .v{font-family:var(--font-num);font-size:22px;font-weight:600}
+.stat.main .v{color:var(--accent);font-size:28px;line-height:1.1}
+.chart svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:16px;border-top:2px solid var(--accent);vertical-align:middle;margin-right:6px}.legend i.run{border-top:3px solid var(--run)}
+.lrow{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center;min-height:56px;padding:8px 14px;border-top:1px solid var(--line)}
+.lrow:first-child{border-top:0}.lrow small{color:var(--muted);font-size:14px}.lrow .num{font-family:var(--font-num);font-weight:600;text-align:right;font-size:15px}
+textarea{font:inherit;font-size:17px;color:var(--ink);background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:10px 12px;width:100%}
+.field-err{color:var(--err);font-size:14px;font-weight:600;display:flex;gap:6px;align-items:flex-start;margin:0}
+.field-err .ic{width:18px;height:18px}
+input[aria-invalid=true]{border-color:var(--err);border-width:2px}
+/* Onboarding */
+.steps.go li.on{background:var(--accent)}
+.pick{display:grid;grid-template-columns:44px 1fr 28px;align-items:center;gap:12px;min-height:76px;padding:12px 14px;border:1px solid var(--line-strong);border-radius:12px;background:var(--surface);text-align:left;color:var(--ink);font:inherit;width:100%;cursor:pointer}
+.pick .ji{width:44px;height:44px}
+.pick b{display:block;font-family:var(--font-display);font-size:19px}.pick small{color:var(--muted);font-size:14px;display:block}
+.tick{width:28px;height:28px;border-radius:8px;border:2px solid var(--line-strong);display:grid;place-items:center;color:transparent}
+.tick .ic{width:18px;height:18px}
+.pick[aria-pressed=true]{border:2px solid var(--accent);padding:11px 13px}
+.pick[aria-pressed=true] .tick{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ck{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:12px;min-height:60px;padding:8px 14px;border-top:1px solid var(--line);color:var(--ink);font-size:16px;font-weight:400;cursor:pointer}
+.ck:first-child{border-top:0}
+.ck input{width:24px;height:24px;margin:0;accent-color:var(--accent)}
+.ck b{font-weight:600;display:block}.ck small{color:var(--muted);font-size:14px;display:block}
+.ldr{display:grid;gap:8px;padding:12px 14px;border-top:1px solid var(--line)}.ldr:first-child{border-top:0}
+.ldr .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ldr .top b{font-weight:600}.ldr .top small{color:var(--muted);font-size:13px}
+.ldr .in{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.ldr .in.two{grid-template-columns:1fr 1fr}
+.chip.sm{min-height:44px;font-size:14px;padding:0 12px}
+.lede{font-size:17px;margin:0}
+.olist{margin:0;padding:0;list-style:none;display:grid;gap:12px;counter-reset:s}
+.olist li{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start;counter-increment:s}
+.olist li::before{content:counter(s);width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:14px}
+.alert.ok{background:var(--ok-bg);color:var(--ok)}
+.alert .ic{flex:none}
+.alert.ink{color:var(--ink)}
+.linkbtn{background:none;border:0;color:var(--accent);font:inherit;font-weight:600;min-height:44px;padding:0 4px;cursor:pointer;justify-self:center;text-decoration:underline}
+.sumrow{display:flex;justify-content:space-between;gap:12px;min-height:48px;align-items:center;border-top:1px solid var(--line);padding:0 14px}.sumrow:first-child{border-top:0}
+.sumrow span{color:var(--muted);font-size:15px}
+</style></head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="i-car" viewBox="0 0 24 24"><path d="M3 16v-4l2-5h14l2 5v4z"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/><path d="M3 12h18"/></symbol><symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></symbol><symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></symbol><symbol id="i-dollar" viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M16 7.5C16 6 14.2 5 12 5s-4 1-4 2.75S9.8 10.5 12 11s4 1.25 4 3.25S14.2 17 12 17s-4-1-4-2.5"/></symbol><symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol><symbol id="i-cabinet" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M12 3v18M4 12h16"/><path d="M10 7.5h0M14 7.5h0M10 16.5h0M14 16.5h0" stroke-width="3"/></symbol><symbol id="i-engine" viewBox="0 0 24 24"><circle cx="7" cy="17" r="3"/><circle cx="18" cy="18" r="2"/><path d="M4 14h12l3 4"/><path d="M8 14l-2-9h3"/></symbol><symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol><symbol id="i-skip" viewBox="0 0 24 24"><path d="M6 5l9 7-9 7z"/><path d="M18 5v14"/></symbol><symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 18l4-6"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol><symbol id="i-chevr" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol><symbol id="i-chevd" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol><symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol><symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17.5v.01"/></symbol><symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></symbol><symbol id="i-fuel" viewBox="0 0 24 24"><path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M3 21h14"/><path d="M5 10h10"/><path d="M15 8l3 3v7a1.5 1.5 0 0 0 3 0v-9l-3-3"/></symbol><symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></symbol><symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V4M7 9l5-5 5 5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></symbol><symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></symbol><symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol><symbol id="i-jar" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="3" rx="1"/><path d="M6 7h12v12a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/><path d="M9 13h6"/></symbol><symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></symbol><symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></symbol><symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c5 0 9 6 9 6a16 16 0 0 1-2.7 3.3M6.2 7.6C4.2 9.1 3 12 3 12s4 6 9 6a8.6 8.6 0 0 0 3.6-.8"/></symbol></svg><main class="page"><header><h1>Onboarding</h1><p>First run: welcome, pick jars, add a first thing per jar, pick starter tasks, set last-done dates. Plus the iPhone Home Screen warning and the path for Vehicle Maintenance App users.</p><p>Mockup only. Made-up data. "Today" is Tuesday, Nov 3, 2026. Green palette; dark tokens follow the system setting. Frames are 390 px unless marked 320. Labels marked <span class="pend"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg>pending owner decision</span> use the recommended answer to an open question.</p></header><div class="frames"><figure><figcaption><b>O1</b>Welcome (one screen). What it is, that data stays on this device, and three ways in. The iPhone note shows only in iPhone/iPad Safari when not already installed.</figcaption><div class="phone tall"><div class="scr"><div class="empty" style="padding:8px 0 0"><svg class="big" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-jar"/></svg><h1>Welcome to Pickle It</h1></div><p class="lede">Keep the things you own in good shape. Pickle It tracks oil changes, furnace filters, check-ups and money deadlines, and tells you what's due.</p><p class="hint">No account. Everything is saved on this device only.</p><div class="alert ink" role="note" style="background:var(--wait-bg)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-info"/></svg><div><p><b>On iPhone? Add Pickle It to your Home Screen first,</b> then open it from there.</p><p>What you enter in a Safari tab stays in Safari, and Safari can clear it if you don't visit often.</p><button class="linkbtn" type="button" style="justify-self:start;padding:0">Show me how</button></div></div><button class="save" type="button">Get started</button><button class="btn2" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-upload"/></svg>Bring data from the Vehicle Maintenance App</button><button class="linkbtn" type="button">Skip for now</button></div></div></figure><figure><figcaption><b>O1b</b>“Show me how” for iPhone. Three steps with the Share icon drawn as it appears in Safari.</figcaption><div class="phone "><div class="scr"><a class="back" href="#"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back"/></svg>Back</a><h1>Add to Home Screen</h1><ol class="olist"><li><span>In Safari, tap <b>Share</b> <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-share"/></svg> in the toolbar.</span></li><li><span>Scroll down and tap <b>Add to Home Screen</b>, then <b>Add</b>.</span></li><li><span>Close Safari and open <b>Pickle It</b> from your Home Screen. Start setting up there.</span></li></ol><p class="hint">Already entered things here in Safari? Export a backup first (Settings › App settings), then import it in the Home Screen app.</p><button class="btn2" type="button">Continue in Safari anyway</button></div></div></figure><figure><figcaption><b>O2</b>Pick jars. Toggle cards (<code>aria-pressed</code>) with a check box drawn in, not just a color change. At least one is needed to continue.</figcaption><div class="phone tall"><div class="scr"><ol class="steps go" aria-label="Step 1 of 5"><li class="on"></li><li class=""></li><li class=""></li><li class=""></li><li class=""></li></ol><h1>What do you want to keep fresh?</h1><p class="hint">Pick any. You can add the rest later.</p><div style="display:grid;gap:10px"><button class="pick" type="button" aria-pressed="true"><span class="ji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-car"/></svg></span><span><b>Vehicles</b><small>Oil changes, tires, registration. Fill-ups and MPG too.</small></span><span class="tick"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg></span></button><button class="pick" type="button" aria-pressed="true"><span class="ji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-home"/></svg></span><span><b>Home</b><small>Filters, tune-ups, gutters, mowers and other machines.</small></span><span class="tick"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg></span></button><button class="pick" type="button" aria-pressed="false"><span class="ji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-heart"/></svg></span><span><b>Health</b><small>Check-ups and renewals for you and your family.</small></span><span class="tick"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg></span></button><button class="pick" type="button" aria-pressed="false"><span class="ji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-dollar"/></svg></span><span><b>Finance</b><small>Tax dates, insurance and other money deadlines.</small></span><span class="tick"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg></span></button></div><p class="hint">Jars you don't pick stay hidden until you show them in Settings. <span class="pend"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg>Unpicked jars start hidden: pending owner decision</span></p><button class="save" type="button">Set up 2 jars</button></div></div></figure><figure><figcaption><b>O3</b>First vehicle: the existing add-a-vehicle walkthrough, shortened to name and odometer here.</figcaption><div class="phone "><div class="scr"><ol class="steps go" aria-label="Step 2 of 5"><li class="on"></li><li class="on"></li><li class=""></li><li class=""></li><li class=""></li></ol><p class="eyebrow">VEHICLES</p><h1>Add your first vehicle</h1><section class="card"><label>Name<input type="text" value="2019 Civic"></label><label>Odometer now<input type="text" inputmode="numeric" value="48,210"></label><p class="hint">Find it on the dashboard. You can fix it later.</p></section><button class="save" type="button">Next: pick tasks</button></div></div></figure><figure><figcaption><b>O4</b>Pick starter tasks from the reviewed Vehicles library. Common ones start checked. The manual reminder from the library shows once.<br><span class="pend"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg>Defaults no source backs (oil 6 mo, cabin 1 yr, brake fluid 2 yr): pending owner decision</span></figcaption><div class="phone tall"><div class="scr"><ol class="steps go" aria-label="Step 2 of 5"><li class="on"></li><li class="on"></li><li class=""></li><li class=""></li><li class=""></li></ol><h1>Tasks for 2019 Civic</h1><p class="note">These are general defaults. Your owner's manual has the right schedule for your car. Edit any task later.</p><div class="row"><span class="hint">10 of 12 picked</span><button class="btn2 small" type="button">Select none</button></div><div class="list"><label class="ck"><input type="checkbox" checked><span><b>Oil and filter change</b><small>Every 5,000 mi or 6 months</small></span></label><label class="ck"><input type="checkbox" checked><span><b>Tire rotation</b><small>Every 5,000 mi</small></span></label><label class="ck"><input type="checkbox" checked><span><b>Check tire pressure and tread</b><small>Every month</small></span><span class="pend"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg>Starts paused: pending</span></label><label class="ck"><input type="checkbox" checked><span><b>Cabin air filter</b><small>Every 15,000 mi or 1 year</small></span></label><label class="ck"><input type="checkbox" checked><span><b>Engine air filter</b><small>Every 30,000 mi</small></span></label><label class="ck"><input type="checkbox" checked><span><b>Brake fluid</b><small>Every 30,000 mi or 2 years</small></span></label><label class="ck"><input type="checkbox"><span><b>Transmission fluid</b><small>Every 60,000 mi</small></span></label><label class="ck"><input type="checkbox"><span><b>Spark plugs</b><small>Every 60,000 mi</small></span></label><label class="ck"><input type="checkbox" checked><span><b>Registration renewal</b><small>Each year · asks for your expiry date</small></span></label></div><p class="hint">+3 more below</p><button class="save" type="button">Next: when were they last done?</button></div></div></figure><figure><figcaption><b>O5</b>First home. Name it, then add any small engines; each becomes its own thing with its own hour reading (decided).</figcaption><div class="phone tall"><div class="scr"><ol class="steps go" aria-label="Step 3 of 5"><li class="on"></li><li class="on"></li><li class="on"></li><li class=""></li><li class=""></li></ol><p class="eyebrow">HOME</p><h1>Your home</h1><section class="card"><label>Name<input type="text" value="Main house"></label></section><h2>Any machines with an engine?</h2><div class="chips" role="group" aria-label="Small engines"><button class="chip sm" type="button" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg>Mower</button><button class="chip sm" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Snow blower</button><button class="chip sm" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>Generator</button><button class="chip sm" type="button" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-plus"/></svg>String trimmer</button></div><section class="card"><label>Mower hour meter (optional)<input type="text" inputmode="decimal" value="214.5"></label><p class="hint">No meter? Leave it blank; its tasks also come due by date.</p></section><button class="save" type="button">Next: pick tasks</button></div></div></figure><figure><figcaption><b>O6</b>Home starter tasks, grouped by thing. Seasonal tasks show the date they'll fall on.<br><span class="pend"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg>Seasonal tasks on fixed calendar dates: pending owner decision</span></figcaption><div class="phone tall"><div class="scr"><ol class="steps go" aria-label="Step 3 of 5"><li class="on"></li><li class="on"></li><li class="on"></li><li class=""></li><li class=""></li></ol><h1>Tasks for Main house</h1><div class="list"><label class="ck"><input type="checkbox" checked><span><b>Check or change HVAC filter</b><small>Every 3 months</small></span></label><label class="ck"><input type="checkbox" checked><span><b>AC tune-up</b><small>Each spring · Apr 1</small></span></label><label class="ck"><input type="checkbox" checked><span><b>Furnace tune-up</b><small>Each fall · Sep 15</small></span></label><label class="ck"><input type="checkbox" checked><span><b>Test smoke and CO alarms</b><small>Every month</small></span></label><label class="ck"><input type="checkbox" checked><span><b>Replace CO alarms</b><small>Asks for the date printed on the alarm</small></span><span class="pend"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg>pending</span></label><label class="ck"><input type="checkbox" checked><span><b>Clean gutters</b><small>Spring and fall · Apr 15, Oct 15</small></span></label><label class="ck"><input type="checkbox" checked><span><b>Winterize outdoor faucets</b><small>Each fall · Oct 15</small></span></label><label class="ck"><input type="checkbox"><span><b>Flush water heater</b><small>Every year</small></span></label></div><h2>Mower</h2><div class="list"><label class="ck"><input type="checkbox" checked><span><b>Mower oil change</b><small>Every 50 hr or 1 year</small></span></label><label class="ck"><input type="checkbox" checked><span><b>Store mower for winter</b><small>Each fall · Nov 4</small></span></label></div><button class="save" type="button">Next: when were they last done?</button></div></div></figure><figure><figcaption><b>O7</b>Last-done dates. One row per task, the input matching its measure: a date for “from last done”, the next date for fixed-date tasks (prefilled), date plus hours for hours tasks. “Not sure” never makes anything overdue on day one.</figcaption><div class="phone tall"><div class="scr"><ol class="steps go" aria-label="Step 4 of 5"><li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li><li class=""></li></ol><h1>When were these last done?</h1><button class="btn2" type="button">Not sure for all</button><div class="list"><div class="ldr"><div class="top"><b>Check or change HVAC filter</b><small>Every 3 months</small></div><div class="in"><input type="text" aria-label="HVAC filter last done" value="Sep 1, 2026"><button class="chip sm" type="button" aria-pressed="false">Not sure</button></div></div><div class="ldr"><div class="top"><b>Test smoke and CO alarms</b><small>Every month</small></div><div class="in"><input type="text" aria-label="Alarms last done" value=""><button class="chip sm" type="button" aria-pressed="true">Not sure</button></div><p class="hint">Not sure: due Dec 3, a month from today.</p></div><div class="ldr"><div class="top"><b>Furnace tune-up</b><small>Each fall</small></div><label>Next date<input type="text" value="Sep 15, 2027"></label></div><div class="ldr"><div class="top"><b>Mower oil change</b><small>Every 50 hr or 1 year</small></div><div class="in two"><label>Date<input type="text" value="Jun 2, 2026"></label><label>Hours then<input type="text" value="208"></label></div></div></div><button class="save" type="button">Finish</button></div></div></figure><figure><figcaption><b>O8</b>Done. A short summary, a reminder that unpicked jars are hidden, then straight to a Pantry that already shows the tasks.</figcaption><div class="phone "><div class="scr"><ol class="steps go" aria-label="Step 5 of 5"><li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li></ol><div class="empty" style="padding:8px 0"><svg class="big" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-jar"/></svg><h1>Your pantry is stocked.</h1></div><div class="list"><div class="sumrow">2019 Civic<span>10 tasks</span></div><div class="sumrow">Main house<span>7 tasks</span></div><div class="sumrow">Mower<span>2 tasks</span></div></div><p class="hint">Health and Finance are hidden. Show them anytime in Settings › App settings.</p><p class="hint">Mileage dates are estimates from your driving. They get better as you log fill-ups.</p><button class="save" type="button">Open my pantry</button></div></div></figure><figure><figcaption><b>O9</b>Coming from the Vehicle Maintenance App. Two ways: copy from this browser (only when old-app data is found here) and CSV import (always). The copy never changes the old app's data.</figcaption><div class="phone tall"><div class="scr"><a class="back" href="#"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-back"/></svg>Back</a><h1>Bring your data over</h1><section class="card"><h2>From this browser</h2><span class="pend"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-clock"/></svg>Copy button: pending owner decision</span><div class="alert ok"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg><p>Found Vehicle Maintenance App data here: 2 vehicles, 148 fill-ups, 31 services.</p></div><button class="save" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-copy"/></svg>Copy it into Pickle It</button><p class="hint">You'll see a preview first. The old app's data isn't changed.</p><p class="note">Installed the old app on an iPhone Home Screen? Its data is kept separately and can't be copied. Export a CSV from it instead.</p></section><section class="card"><h2>From a backup file</h2><ol class="olist"><li><span>In the Vehicle Maintenance App: <b>Settings › Export</b>.</span></li><li><span>Here: choose that file.</span></li></ol><button class="btn2" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-upload"/></svg>Choose CSV file</button><p class="hint">Pickle It backups work here too.</p></section></div></div></figure><figure><figcaption><b>O10</b>Import preview (same flow as today): counts, then Merge or Replace. Importing the same file twice with Merge adds nothing new.</figcaption><div class="phone "><div class="scr"><h1>Ready to import</h1><p class="hint" style="overflow-wrap:anywhere">vehicle-maintenance-app-2026-10-30.csv</p><div class="list"><div class="sumrow">Vehicles<span>2</span></div><div class="sumrow">Maintenance schedules<span>16</span></div><div class="sumrow">Shops<span>3</span></div><div class="sumrow">Fill-ups<span>148</span></div><div class="sumrow">Service history<span>31</span></div></div><p class="hint">From the Vehicle Maintenance App. Everything lands in your Vehicles jar.</p><button class="save" type="button">Merge into my pantry</button><button class="btn2" type="button">Replace everything</button><button class="linkbtn" type="button">Cancel</button></div></div></figure><figure><figcaption><b>O11</b>Error and not-found states. A file that can't be read says why and how to fix it; if no old-app data is in this browser, the copy card says so and points to CSV.</figcaption><div class="phone "><div class="scr"><h1>Bring your data over</h1><div class="alert bad" role="alert"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-alert"/></svg><div><p><b>We couldn't read that file.</b></p><p>It doesn't look like a Pickle It or Vehicle Maintenance App backup. Pick the .csv file you exported.</p></div></div><button class="btn2" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-upload"/></svg>Choose another file</button><section class="card"><h2>From this browser</h2><p class="hint">No Vehicle Maintenance App data in this browser. If you used it on another phone or browser, export a CSV there.</p></section></div></div></figure></div></main></body></html>
