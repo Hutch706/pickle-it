@@ -1,8 +1,8 @@
 # Pickle It: data model, due dates, storage and migration
 
-Status: **draft proposal** from data-architect, revised 2026-11-03 (second pass) to match docs/decisions.md "2026-11-03 (Phase 1 decisions)". Decided by the owner and marked **(decided)** here: storage approach, storage names, v1 jars, recurrence measures, CSV versioning, box boundaries, rolling week, season dates, several homes/people, hiding jars, units, which measures may combine, estimated dates for miles and hours, what Health and Finance hold, and hosting on the shared github.io origin. Everything else is proposed; open items are in "Decisions needed" at the end.
+Status: **draft proposal** from data-architect, revised 2026-11-03 (second pass) to match docs/decisions.md "2026-11-03 (Phase 1 decisions)", and again for "2026-11-03 (Phase 2 open questions)". Decided by the owner and marked **(decided)** here: storage approach, storage names, v1 jars, recurrence measures, CSV versioning, box boundaries, rolling week, season dates, several homes/people, hiding jars, units, which measures may combine, estimated dates for miles and hours, what Health and Finance hold, hosting on the shared github.io origin, no data copy from the old app, the scope of Delete all data, the 90-day estimate rule, seasonal tasks on fixed calendar dates, appliances, the Finance default thing and the account-number warning. Everything else is proposed; open items are in "Decisions needed" at the end.
 
-Sources read: CLAUDE.md, docs/decisions.md, docs/brief.md, docs/specs/v1-scope.md (draft, being revised in parallel), docs/reviews/privacy-security-2026-11-03.md, data.js, app.js, sw.js, index.html and manifest.webmanifest (storage names only), and the Vehicle Maintenance App's data.js as imported in commit e1b58e8 (its storage layout, for 4.2).
+Sources read: CLAUDE.md, docs/decisions.md, docs/brief.md, docs/specs/v1-scope.md (draft, being revised in parallel), docs/reviews/privacy-security-2026-11-03.md, data.js, app.js, sw.js, index.html and manifest.webmanifest (storage names only).
 
 **Terms.** This doc says **thing** for what the user owns (a vehicle, a home, a mower) and **item** for one recurring task on it. v1-scope.md calls these "item" and "task". Same concepts; the code names can be settled when it's built.
 
@@ -60,11 +60,11 @@ Adding Pets later means adding an entry. No migration. Jars only become a store 
 | Jar | Things are | Measures allowed on its items |
 |---|---|---|
 | Vehicles | vehicles | miles, time, hours; combined only miles + time or hours + time |
-| Home | homes, and each small engine as its own thing ("Mower") | time, hours; combined only hours + time |
+| Home | homes; each small engine as its own thing ("Mower"); an appliance as its own thing if the user wants ("Fridge") | time, hours; combined only hours + time |
 | Health | people ("Me", "Sam") | time only |
-| Finance | households or accounts the user names ("Household", "Rental") | time only |
+| Finance | households or accounts the user names; the first one defaults to "Household" ("Rental", "Car insurance") | time only |
 
-Several of each (several homes, several people, several households) are allowed (decided). The record builders reject anything outside this table: a `miles` rule off a vehicle, an `hours` or `miles` rule in Health or Finance, or miles + hours on one item.
+Several of each (several homes, several people, several households) are allowed (decided). **Appliances (decided):** an appliance can be its own Home thing, but starter tasks for appliances (fridge coils, dryer vent, water heater) sit on the home by default; the user can move or add them to an appliance thing. Nothing in the model changes either way: an appliance is a Home thing like a mower. The record builders reject anything outside this table: a `miles` rule off a vehicle, an `hours` or `miles` rule in Health or Finance, or miles + hours on one item.
 
 ### 2.3 Stores (IndexedDB `pickle-it`)
 
@@ -112,17 +112,20 @@ At least one of `miles`, `hours`, `time` is required. Allowed combinations **(de
 | forDue | YYYY-MM-DD or "" | New. The due date this log closed, saved when it's logged. Needed for calendar schedules (3.2). "" for imports and one-off jobs. |
 | createdAt, updatedAt | ISO timestamp (UTC) | |
 
-**readings** (key `id`): **new.** An hour-meter reading taken without doing a task ("Update hours"). Vehicles don't need this: fill-ups, including odometer-only fill-ups, already are readings.
+**readings** (key `id`): **new.** An hour-meter reading taken without doing a task ("Update hours"). Vehicles don't need this for plain odometer readings: fill-ups, including odometer-only fill-ups, already are readings. Also holds meter changes for either meter (3.3b, proposed).
 
 | Field | Type | Notes |
 |---|---|---|
 | id | string | `newId("r")` |
 | thingId | string | |
 | date | YYYY-MM-DD | |
-| hours | number | 0-99,999.9 |
+| hours | number or null | 0-99,999.9. Null only on a miles meter change. |
+| meter | `"hours"` (default) \| `"miles"` | **Proposed, 3.3b.** Which meter the row is for. `"miles"` only on a meter change for a vehicle. |
+| odometer | whole miles or null | **Proposed, 3.3b.** Only on a miles meter change: the new odometer's first value. |
+| oldValue | number or null | **Proposed, 3.3b.** Set only on a meter change: the old meter's last value. `hours` or `odometer` is then the new meter's first value. Null on a normal reading. |
 | createdAt, updatedAt | ISO timestamp (UTC) | |
 
-Current hours for a thing = the highest of its starting `hours`, its logs' `hours` and its readings (same idea as `latestOdo`).
+Current hours for a thing = the highest of its starting `hours`, its logs' `hours` and its readings (same idea as `latestOdo`), after adjusting for meter changes (3.3b).
 
 **fillups** (key `id`): unchanged except `vehicleId` is renamed `thingId` and `updatedAt` is added.
 
@@ -133,7 +136,7 @@ Current hours for a thing = the highest of its starting `hours`, its logs' `hour
 
 ### 2.4 Health and Finance (decided)
 **Health tracks reminders only in v1:** recurring appointments and renewals per person. **Finance tracks money deadlines only:** no amounts. Both use the model above with nothing jar-specific added. The earlier open questions are settled:
-1. **What a thing is:** Health, a person, name only ("Me", "Sam", "Dad"); Finance, a household or account the user names ("Household", "Rental", "Car insurance"). Several of each.
+1. **What a thing is:** Health, a person, name only ("Me", "Sam", "Dad"); Finance, a household or account the user names ("Household", "Rental", "Car insurance"); the first one is prefilled "Household" (decided). Several of each.
 2. **Measures:** time only (`from: "done"` or `"calendar"`). No miles, no hours.
 3. **Log fields:** date, provider (`shop`, name only, from the jar's own list), notes, status, `forDue`. Nothing else: no amounts, no results, no doses, no policy or account numbers.
 4. **One-time deadlines:** not in v1; every item recurs (2.7). A one-off can be logged as `itemId: "other"`, which never shows in the boxes.
@@ -148,13 +151,13 @@ A hard rule for every jar, in the record builders and the importer: **no field, 
 - Finance: amounts and balances (until the owner approves amounts after a privacy review), account, routing or card numbers, SSN or tax ID.
 - Any jar: provider or shop phone or address, passwords, PINs, security answers, the user's own name, email or phone, location or GPS, photos, device IDs, analytics or advertising IDs.
 
-Free-text notes and names can still hold anything the user types. That's handled in the UI, not the model: per-jar note placeholders and the soft warning on long digit runs (privacy review 2.4), which run on the device and store nothing. Thing and item names never go in the URL or `document.title`.
+Free-text notes and names can still hold anything the user types. That's handled in the UI, not the model: per-jar note placeholders and the soft warning (decided for v1). **Account-number warning:** when a Health or Finance thing name, item name, provider or note contains a run of 9 or more digits or a likely card number (13-19 digits passing a Luhn check; privacy review 2.4, v1-scope D14), the form asks "This looks like an account or ID number. Pickle It backups aren't encrypted. Save anyway?" The check runs in app.js in the save handler, on the device, before the record builder. Choosing Save stores the text exactly as typed, the same as any other text: no flag, no masking, no separate field, nothing about the check. The importer doesn't run it. Thing and item names never go in the URL or `document.title`.
 
 ### 2.5 Why this shape
 - One task model for every jar: a thing, items with any mix of miles, hours and time, and logs. Only fill-ups and MPG are vehicle-specific.
 - Keeping items embedded and keeping the existing record builders (`makeVehicle`, `makeItem`, `makeService`, `makeFillup`) with small additions keeps the import/merge code in data.js nearly intact.
 - Hours mirror miles exactly (`every`/`remind`, current reading = highest reading, same "no log yet" rule), so the code reuses the mileage path with a different reading source.
-- The `vehicleId` to `thingId` rename is mechanical. CSV columns keep their old names (4.2).
+- The `vehicleId` to `thingId` rename is mechanical. CSV columns keep their old names (4.3).
 
 ### 2.6 Where small UI state lives
 - Device-only conveniences (box collapsed/expanded, Log section Hide/Show, theme, palette): localStorage under `pickle-it:` keys, as today. Not exported.
@@ -198,7 +201,7 @@ Two kinds, chosen by `time.from`:
   - Done very late (more than a full cycle): the first occurrence after the done date, so missed cycles don't pile up.
 - A missed occurrence with no log stays due (and goes overdue) until it's done or skipped. For frequent fixed dates like recycling, Skip (3.5) is the expected way to clear a missed one.
 
-**Seasons.** "Each spring/summer/fall/winter" is a calendar yearly schedule (`n: 1, unit: "year", from: "calendar"`) with `firstDue` at the next season start and `season` saved as a label. v1-scope's "preferred month" maps to the same thing with `firstDue` on the 1st of that month. **Season dates (decided):** the maintenance-content-curator picks a date per library task (e.g. furnace tune-up Sep 15); a task with no curated date uses the fixed season start: north Mar 1, Jun 1, Sep 1, Dec 1; south shifted 6 months. The curated date is just the library item's default `firstDue` month and day, so it needs no new field. Changing the hemisphere setting doesn't move existing items. Location is never read.
+**Seasons (decided: fixed calendar dates).** "Each spring/summer/fall/winter" is a calendar yearly schedule (`n: 1, unit: "year", from: "calendar"`) with `firstDue` at the next season start and `season` saved as a label. v1-scope's "preferred month" maps to the same thing with `firstDue` on the 1st of that month. **Season dates (decided):** the maintenance-content-curator picks a date per library task (e.g. furnace tune-up Sep 15); a task with no curated date uses the fixed season start: north Mar 1, Jun 1, Sep 1, Dec 1; south shifted 6 months. The curated date is just the library item's default `firstDue` month and day, so it needs no new field. Changing the hemisphere setting doesn't move existing items. Location is never read.
 
 Why calendar mode instead of "last done + interval, then snap to the preferred month" (v1-scope 4.4 AC 4): with a yearly interval the snap rule skips a year whenever the task is done after its month. Furnace tune-up preferred in September, done Oct 15: last done + 1 year = Oct 15 next year, and the next September on or after that is the year after, so a whole year is lost. Calendar mode gives next September.
 
@@ -220,7 +223,7 @@ Each small engine is its own thing in Home and holds its own hour reading (decid
 - left = due value - current value. Hours: round to 0.1 (`Math.round(x * 10) / 10`) to drop floating-point noise.
 - No current reading at all (no starting value, no logs, no readings): no meter due; the item shows "Add a reading" and goes to Later unless another rule places it.
 
-**Estimated date (decided for both miles and hours; the rule below is proposed).** One function for both meters, so mileage and hours items land in the date boxes. Hours use hours per day between readings, exactly as miles use miles per day.
+**Estimated date (decided for both miles and hours, including the 90-day and 30-day rule below).** One function for both meters, so mileage and hours items land in the date boxes. Hours use hours per day between readings, exactly as miles use miles per day.
 - **Readings** for the thing: miles = starting odometer (if `odometerDate` is set), fill-ups and logs with an odometer; hours = starting hours (if `hoursDate` is set), logs with hours and `readings`. Only those dated within the last 365 days (date ≥ T - 365).
 - **Enough readings** means all three:
   1. at least 2 readings at least 30 days apart,
@@ -245,18 +248,37 @@ Mileage tasks show **"<miles remaining> / <estimated date>"** and hours tasks **
 |---|---|---|
 | Miles remaining | `left` (whole miles) | Device number format, unit "mi": `2,600 mi` |
 | Hours remaining | `left` rounded to 0.1 | One decimal, trailing `.0` dropped, unit "hr": `2 hr`, `2.5 hr`, `1,204.5 hr` |
-| Estimated date | D for the item (3.4): E above, or the time rule's due date if it's earlier | `Today` when D = T; `Nov 17` when D is in T's year; `Jan 5, 2028` otherwise (device locale short month, en-US shown) |
+| Estimated date | D for the item (3.4): E above, or the time rule's due date if it's earlier | `Today` when D = T; `Nov 17`; with the year when D is more than about 6 months after T, `Jun 3, 2027` (decided; device locale short month, en-US shown). A passed estimate shows `Due now` instead (next table) |
 
 | Situation | Row shows | Example |
 |---|---|---|
 | left > 0 and the item has a D | remaining / date | `400 mi / Nov 17`, `2 hr / Nov 7` |
 | left > 0, no D (no estimate, no time rule) | remaining only | `400 mi`, `63 hr` |
-| left = 0 | `Due now` | `Due now` |
+| left = 0, or E was before T (set to T in 3.3) with no newer reading | `Due now`, no date | `Due now` |
 | left < 0 (overdue by reading) | amount over, no date | `120 mi over`, `5.5 hr over` |
-| No reading at all | prompt, no date | `Add a reading` (hours), `Add odometer` (miles) |
+| No reading at all | prompt, no date | `Add a reading`, for miles and hours alike |
 | miles + time or hours + time, time rule overdue, meter left > 0 | remaining / the time rule's due date, with the overdue flag | `3,000 mi / Nov 1` (shown as overdue) |
 
 For combined items the date is always D, the earlier of the estimate and the time rule's due date, so the row shows when it's really due. Time-only items aren't in this table; they show their due date as v1-scope and the mockups define.
+
+### 3.3b Meter reset or replacement (proposed, needs owner decision)
+An odometer or hour meter can go backward: a replaced engine or instrument cluster, a swapped hour meter, an old mechanical meter rolling over. Today nothing handles this. The math in 3.3 takes the **highest** reading as current, so a lower new reading is ignored: due values freeze at the old meter's numbers, and rule 2 of "enough readings" fails (the latest reading is lower than the earliest), so there's no estimated date either. The item sits in the wrong box until the new meter passes the old one's highest value.
+
+**Proposal: record the change, then shift the older readings.** A meter change is one `readings` row (2.3) with the date, the old meter's last value (`oldValue`) and the new meter's first value. Every reading of that meter on that thing dated before the change (or on the same date and created before it) is shifted by `new - old`, at read time. Stored values never change, so history shows what was typed; the shift is recalculated like due dates. With several changes, a reading is shifted by the sum of every later change. All of 3.3 then runs unchanged on the shifted values: current value, due value, left, rate, the 30-day and 90-day rules. Shifted values can be negative; that's fine for the math and never shown.
+
+- **How it's recorded:** when a fill-up, log or reading is lower than the current value, the form asks "That's lower than the last reading (150.0 hr). Was the meter replaced or reset?" Yes saves the entry plus a meter change with `oldValue` prefilled to the current value (editable). No means a typo; the user fixes the number. A "Meter replaced" action on the thing does the same without a regular entry.
+- **Swapped meter, same engine:** nothing else to do; schedules carry over exactly.
+- **New engine:** the schedules also carry over. If the new engine came with fresh oil, the user logs those items as done at the change, as with any service.
+- **No change recorded:** the lower reading is kept (4.4) and 3.3 behaves as described above, so the app should always ask.
+- **MPG:** should use the same shifted odometer, so the fill-up after a change gives a normal distance instead of a negative one. Not checked against the current MPG code; check at build.
+- **Export:** if approved, version 2 appends `meter` and `old_value` columns to `reading` rows (4.3) and allows `reading` rows for vehicles.
+
+**Worked example** (T = 2026-11-03, the same mower as 3.8):
+
+| Item | Rule | Last log / readings | Due | Box |
+|---|---|---|---|---|
+| Mower oil, hour meter replaced | every 50 hr (remind 5) or 1 year from done | done 2026-05-01 at 120.0 hr; meter replaced 2026-08-01, old meter at 150.0, new at 0.0 (shift -150.0); reading 18.0 hr on 2026-10-30 | log shifts to -30.0, so due = -30.0 + 50 = 20.0; current 18.0; left 2.0. Rate: -30.0 on May 1 to 18.0 on Oct 30 = 48 hr in 182 days; E = Oct 30 + ceil(2.0 x 182 / 48) = 8 days = 2026-11-07 (day 4); time 2027-05-01; D = 2026-11-07 | This week, shows `2 hr / Nov 7` |
+| Same, change not recorded | as above | the same three values, no meter change | current 150.0 (highest), due 170.0, left 20.0; no estimate (latest reading 18.0 is lower than the earliest) | Later (left > remind), shows `20 hr`, which is wrong: 2 hr are really left |
 
 ### 3.4 Whichever comes first
 Each rule on an item gives a placement:
@@ -313,7 +335,7 @@ T = 2026-11-03 (a Tuesday).
 | Snowblower spark plug | every 100 hr (remind 10) | no logs, one reading: starting hours 37.0 | 100.0 hr, left 63.0, no estimate (one reading) | Later, shows `63 hr` |
 | Pressure washer pump oil | every 50 hr (remind 5) | done 2026-04-20 at 10.0 hr; reading 52.5 hr on 2026-07-15 (more than 90 days ago) | 60.0 hr, left 7.5, no estimate (stale) | Later (left > remind), shows `7.5 hr` |
 | Chainsaw chain | every 10 hr (remind 2) | no starting hours, no logs | no reading | Later, shows `Add a reading` |
-| Outboard impeller | every 100 hr (remind 10) | done 2026-06-01 at 300.0 hr; reading 395.0 hr on 2026-10-01; 95 hr in 122 days = 0.779 hr/day | 400.0 hr, left 5.0; E = Oct 1 + ceil(5.0 / 0.779) = 7 days = 2026-10-08, before T, so E = T | This week (due today, not overdue), shows `5 hr / Today` |
+| Outboard impeller | every 100 hr (remind 10) | done 2026-06-01 at 300.0 hr; reading 395.0 hr on 2026-10-01; 95 hr in 122 days = 0.779 hr/day | 400.0 hr, left 5.0; E = Oct 1 + ceil(5.0 / 0.779) = 7 days = 2026-10-08, before T, so E = T | This week (due today, not overdue), shows `Due now` |
 
 Boundaries: day 6 (Nov 9) is the last day of This week, day 7 (Nov 10) the first of This month, day 27 (Nov 30) the last of This month, day 28 (Dec 1) the first of Later.
 
@@ -322,7 +344,7 @@ Boundaries: day 6 (Nov 9) is the last day of This week, day 7 (Nov 10) the first
 ## 4. Migration and backup files
 
 ### 4.1 Moving from the Vehicle Maintenance App: CSV
-Decided: users can always move data by CSV export and import. A one-time read-only copy is proposed on top of this in 4.2 (owner decision 1).
+Decided: CSV export and import is the only way to bring Vehicle Maintenance App data over. There's no copy from the old app's database, and nothing in Pickle It detects, opens or reads the old app's database or `vma:` keys (decided 2026-11-03: the old app has no users with data). Old-app files import as version 1 (no `format_version` column), which already works.
 1. In the old app: Settings → Export. It saves `vehicle-maintenance-app-YYYY-MM-DD.csv`.
 2. In Pickle It: Import, choose the file, see the preview, choose Merge or Replace (same flow as today).
 
@@ -343,37 +365,8 @@ Fill-Up Receipts (the app's earlier name): anyone who opened the Vehicle Mainten
 
 **Regression fixtures** (qa-accessibility-tester): keep version 1 exports in the repo as test files with made-up data only: a Vehicle Maintenance App export (no `format_version` column), a Pickle It version 1 export (`format_version` = 1), one re-saved by Excel (US), one semicolon/decimal-comma (European Excel), and one with formula-guarded text. Every release must import all of them with identical results.
 
-### 4.2 Moving existing users before the old app is deleted (proposal, needs owner decision)
-**Hosting is decided:** Pickle It launches on the same GitHub Pages origin (`hutch706.github.io`) as the Vehicle Maintenance App, and the owner deletes the old app once Pickle It v1 is ready. On one origin, Pickle It's code can open the old app's IndexedDB `vehicle-maintenance-app` directly.
-
-**This is a different proposal from the one removed on 2026-11-03.** That code (`moveFromOldName()`) copied the old database and then **deleted** it, and ran automatically on every start, so on a shared address it would have taken another app's data. What's proposed here never deletes, never writes to the old database, and runs only when the user taps a button.
-
-**Option A. CSV only** (what's decided today).
-- Users export in the old app and import in Pickle It (4.1).
-- Cost: nothing new to build. Risk: anyone who doesn't export before the old app goes away has to find their data some other way. The data stays in their browser after the old site is deleted, but without the old app there's no button to export it.
-
-**Option B. CSV plus a one-time read-only copy** (recommended).
-- On first run, and in Settings → App settings until used, Pickle It checks whether `vehicle-maintenance-app` exists in this browser. If it does, it offers: "Found Vehicle Maintenance App data in this browser. Copy it into Pickle It? The old app's data isn't changed."
-- How it reads, without side effects:
-  1. Check `indexedDB.databases()` for the name where the browser supports it. Otherwise open `indexedDB.open("vehicle-maintenance-app")` **with no version number**; if `onupgradeneeded` fires, the database didn't exist, so abort that transaction (`r.transaction.abort()`) so no empty database is left behind.
-  2. Read `vehicles`, `fillups`, `services` and `settings` (`shops`) in one `"readonly"` transaction, then close the connection. Never `deleteDatabase`, never a `"readwrite"` transaction, never a version bump.
-  3. Turn the records into the same rows a version 1 CSV gives (4.1 mapping) and hand them to the existing import preview, then Merge or Replace. Every record goes through the same record builders, length caps, allow-lists and id check (4.4) as a file. That keeps new code to the reader, about 40 lines.
-  4. Save `settings.vmaCopiedAt` (a timestamp, nothing about the contents) so the offer doesn't come back. Running it again is harmless: Merge skips duplicates by id.
-- Doesn't read `vma:` localStorage keys (only UI preferences) or the old app's caches.
-- `fillup-receipts` (the name before that): the old app moved that database into `vehicle-maintenance-app` on its next start. A user who never opened the old app after the rename still has it. Recommend not reading it: few users, and CSV covers them.
-- **Where it can't work.** Storage is per browser and per install. On iPhone, a home-screen web app has its own storage, separate from Safari, so Pickle It in Safari can't see an installed old app's data (or the reverse). The same applies to a different browser or device. These users need CSV. On Android Chrome an installed app shares the browser's storage, so the copy works there.
-- **Privacy.** Reading another app's database is allowed only because both are the owner's apps on the owner's origin, and it only happens on the user's tap. privacy-security-reviewer should confirm before build.
-- Cost: small (the reader plus one prompt). It can be removed in a later release once the old app has been gone for a while.
-
-**Recommendation: B**, because the people most likely to lose data are the ones who won't read a notice and export. CSV stays the path for everyone else.
-
-**What the old app must tell its users before it's taken down** (a final update to the Vehicle Maintenance App, needed with either option; release-manager writes the copy):
-1. A banner on every screen: Pickle It replaces this app, with a link to Pickle It and the date this app stops working.
-2. An Export button right in the banner, and how to import in Pickle It (Settings → Import, Merge).
-3. "Installed this app on your iPhone home screen? Export now. Pickle It can't see data saved inside the home-screen app." With option B, also: "On Android or in the same browser, Pickle It can copy your data for you."
-4. That data isn't deleted when the site goes away, but there's no way to reach it without the old app, and browsers (especially Safari) may clear it.
-5. Keep the banner up for a set time before deleting, e.g. 60 days, and keep a small "this app has moved" page with the Pickle It link at the old address for a while after, instead of a 404. An installed copy may keep opening from its offline cache, so that page is what it finds once it next loads from the network.
-6. The old app keeps its own storage names, so nothing in Pickle It touches its data apart from the read-only copy, and Pickle It's "Delete all data" (section 6) never touches it.
+### 4.2 (Removed)
+The read-only copy from the old app's database is dropped (decided 2026-11-03: the Vehicle Maintenance App has no users with data). No old-app banner or notice period either. Numbers 4.3 and 4.4 are kept because other docs cite them.
 
 ### 4.3 Export format, version 2
 Still one CSV, because users already have it, it opens in Excel, and the importer handles Excel's quirks.
@@ -393,7 +386,7 @@ Still one CSV, because users already have it, it opens in Excel, and the importe
 - Other things are `thing` rows (`thing`, `thing_id`, `jar`, `active`, `date` + `hours` for starting hours, `created_at`, `updated_at`).
 - Their items are `schedule` rows and their logs `maintenance` rows that use `thing`/`thing_id` instead of `vehicle`/`vehicle_id`, with blank mileage and odometer.
 - Rules: miles in `every_mi`/`remind_mi` (as now), hours in `every_hr`/`remind_hr`, time in `every_n`, `every_unit`, `time_from`, `first_due`, `season`. Whichever-first items fill more than one group.
-- Logs carry `hours`, `status` and `for_due`. Readings are `reading` rows with `thing_id`, `date`, `hours`.
+- Logs carry `hours`, `status` and `for_due`. Readings are `reading` rows with `thing_id`, `date`, `hours` (plus the meter change columns in 3.3b, if approved).
 - Shops are `shop` rows with `jar` set. A `shop` row with a blank `jar` (every version 1 file) goes to `vehicles`.
 
 **Rules for future versions:** bump `format_version`, only append columns or record types, never rename or repurpose a column, and keep reading every older version.
@@ -416,7 +409,7 @@ Import is a trust boundary: files can come from anyone. Everything in 4.1 (recor
 | `status` | `done`, `skipped`; blank means `done` |
 | `item_active`, `active` | today's yes/no values |
 
-**Numbers.** `hours`, `every_hr`, `remind_hr` and `reading` hours: finite, 0-99,999.9, rounded to one decimal, decimal comma accepted; `NaN`, `Infinity` and negatives reject the row. `every_n`: whole 1-999. A reading lower than an earlier one is kept (meter replaced); current hours is still the highest reading.
+**Numbers.** `hours`, `every_hr`, `remind_hr` and `reading` hours: finite, 0-99,999.9, rounded to one decimal, decimal comma accepted; `NaN`, `Infinity` and negatives reject the row. `every_n`: whole 1-999. A reading lower than an earlier one is kept; without a meter change row it doesn't lower the current value (3.3b).
 
 **Combinations.** A `schedule` row whose rules break 2.2 or 2.3 (miles off a vehicle, hours or miles in Health or Finance, miles + hours) is rejected.
 
@@ -428,11 +421,12 @@ Import is a trust boundary: files can come from anyone. Everything in 4.1 (recor
 
 ## 5. Personal data: for privacy-security-reviewer
 
-1. **Shared origin with the old app (decided: shared github.io origin).** The renames in 2.1 are done, including the BroadcastChannel and the scoped cache cleanup, so the apps don't mix data by accident. Each app can still read the other's storage, and a script-injection bug in either exposes both, until the old app is deleted. The proposed read-only copy (4.2) uses that same-origin access on purpose; please review it before build.
+1. **Shared origin with the old app (decided: shared github.io origin).** The renames in 2.1 are done, including the BroadcastChannel and the scoped cache cleanup, so the apps don't mix data by accident. Each app can still read the other's storage, and a script-injection bug in either exposes both, until the old app is deleted. Pickle It never reads the old app's storage (4.1).
 2. **What the data reveals.** Fill-up dates and station names show where someone was and when. Home items and their dates show what someone owns and possibly when they're away. Notes are free text and can hold anything (VINs, addresses, gate codes).
-3. **Health and Finance (decided: reminders and money deadlines only).** Fields that are never stored are in 2.4a. Provider lists are per jar (2.3, fixes M5). Task names and notes can still reveal conditions or debts; per-jar note placeholders and the digit-run warning are UI work.
+3. **Health and Finance (decided: reminders and money deadlines only).** Fields that are never stored are in 2.4a. Provider lists are per jar (2.3, fixes M5). Task names and notes can still reveal conditions or debts; per-jar note placeholders and the account-number warning (2.4a) are UI work.
 4. **Backups are plain text (decided: one full backup with a warning).** Every export shows the "isn't encrypted" line from privacy review 2.6.
-5. **Import is a trust boundary.** 20 MB limit, record builders, and the version 2 checks in 4.4 (allowed values, number ranges, id pattern).6. **Data loss.** iPhone Safari can delete storage for sites not installed to the home screen. Check the install prompt and backup reminder copy cover this. The app already asks for persistent storage (`askPersist`).
+5. **Import is a trust boundary.** 20 MB limit, record builders, and the version 2 checks in 4.4 (allowed values, number ranges, id pattern).
+6. **Data loss.** iPhone Safari can delete storage for sites not installed to the home screen. Check the install prompt and backup reminder copy cover this. The app already asks for persistent storage (`askPersist`).
 7. **Cloud sync later** needs its own privacy review before any build (accounts, server copies, deletion, breach handling).
 8. **Hemisphere setting** is chosen by the user; location permission is never requested.
 9. **Test fixtures** in 4.1 must contain made-up data only, Health and Finance especially. This repo may become public.
@@ -442,31 +436,32 @@ Import is a trust boundary: files can come from anyone. Everything in 4.1 (recor
 
 ## 6. Delete all data
 
-Settings → App settings has a "Delete all data" button that asks the user to confirm at least twice (decided). The first step offers Export first. The wording and dialogs are the spec writer's and designer's; this section says what gets cleared.
+Settings > App settings has a "Delete all data" button. The user confirms twice, the second time by typing DELETE (any case) (decided). The first step offers Export first. The wording and dialogs are the spec writer's and designer's; this section says what gets cleared. **Scope (decided): only Pickle It's data.**
 
-**Cleared** (everything Pickle It saves on this device):
-1. **IndexedDB `pickle-it`:** every store, in one `"readwrite"` transaction, so it's all or nothing: `things`, `logs`, `readings` (hour readings included), `fillups`, `settings` (shops, last export, change count, hemisphere, hidden jars, onboarding done, `vmaCopiedAt`). Clearing the stores rather than calling `deleteDatabase` avoids the "blocked" state when another tab has the database open, and keeps the schema in place.
-2. **localStorage:** every key that starts with `pickle-it:` (theme, palette, box and section collapse, nudge snoozes, last-used vehicle and the rest). Loop over `localStorage` and remove by prefix, so keys added later are covered without a list to keep up to date.
-3. **Caches:** every cache whose name starts with `pickle-it-`. They hold only app files, no user data, so if the device is offline, skip this step; otherwise the app can't reopen until it's online again. The service worker re-saves the files on the next load.
-4. **Other open tabs:** post a message on the `pickle-it` BroadcastChannel so they reload and show the empty app.
+**Steps, in order:**
+1. **IndexedDB:** close this tab's connection (`idb.close()`), then `indexedDB.deleteDatabase("pickle-it")`. One step deletes every store, including any added later (`things`, `logs`, `readings`, `fillups`, and `settings` with shops, last export, change count, hemisphere, hidden jars, onboarding done), and the database files, so nothing is left for a write-back or in leftover files (privacy review P2-M3). It names `pickle-it` exactly, so it can't touch another app's database.
+2. **Wait for success.** Claim success only on `onsuccess`. On `onerror`, say it failed, run nothing below, and offer a retry.
+3. **localStorage:** only after step 2, remove every key that starts with `pickle-it:`, looping and matching the prefix so keys added later are covered. This resets theme and palette to their defaults (System, Green) along with collapse state and the rest.
+4. **Other open tabs:** post `"wiped"` on the `pickle-it` BroadcastChannel. Other tabs call `location.reload()`, not `reload()`, so open dialogs are dropped and they show the empty app. Today's handler (`bc.onmessage` in app.js) reloads data on any message; it needs this `"wiped"` branch.
+5. **Reload this tab.** The next `openDB()` recreates the empty schema and onboarding runs.
 
-Then reload the page. The app starts fresh, with onboarding.
+**Blocked delete (another tab holds the database open).** Every connection already closes itself on `versionchange` (`openDB()` in data.js sets `idb.onversionchange = () => idb.close()`), so other Pickle It tabs let go as soon as the delete starts, and a late save from them fails instead of writing data back. If a connection still doesn't close (a tab running an older copy of the app, or a frozen background tab), the browser fires `onblocked` and holds the delete until it closes. The app then shows "Close other Pickle It tabs to finish deleting" and keeps waiting; the request completes by itself once that tab closes. While blocked it doesn't report success, clear localStorage or reload, and the data still exists until `onsuccess`.
 
-**Never touched:** anything not named `pickle-it` / `pickle-it:` / `pickle-it-`. On the shared origin that means the Vehicle Maintenance App's `vehicle-maintenance-app` database, its `vma:` keys and its caches. So: no `localStorage.clear()`, no `Clear-Site-Data`, no deleting every cache, no `indexedDB.deleteDatabase` on any other name. Not reversible: the user's exported CSV files are the only way back, which is why the first step offers Export.
+**Not cleared, on purpose:**
+- **The `pickle-it-v1` cache and the service worker registration.** They hold only the app's own files (sw.js caches same-origin app files; user data never goes through it), so deleting them protects nothing and would stop the app reopening offline (privacy review P2-m1). They stay, and the app reopens empty.
+- **Anything not named `pickle-it` / `pickle-it:`.** No `localStorage.clear()`, no `Clear-Site-Data`, no deleting Cache Storage of any other app, no `deleteDatabase` on any other name. On the shared origin that leaves the Vehicle Maintenance App's database, `vma:` keys and caches alone; there's no option to delete them (decided).
+
+Not reversible: the user's exported CSV files are the only way back, which is why the first step offers Export.
 
 **Can't be cleared by the app:** the persistent-storage grant (`navigator.storage.persist()` can't be undone; it holds no data), files the user exported, and the installed home-screen icon. Help copy should say that removing the app from the home screen or clearing site data in the browser also deletes everything.
-
-If the clear fails (storage error), nothing is deleted (one transaction) and the app says so; localStorage and caches are cleared only after the database clear succeeds.
 
 ---
 
 ## Decisions needed (owner)
 
-Decided since the last draft and removed from this list: box boundaries (7-27), rolling week, estimated dates for miles **and** hours, season dates, several homes and people, hiding jars, units, combined measures, Health and Finance contents, hosting.
+Decided since the last draft and removed from this list: the old-app copy (dropped; CSV only), the seasonal rule (fixed calendar dates), the 90-day estimate rule, and the scope of Delete all data.
 
-1. **Moving existing Vehicle Maintenance App users before it's deleted (4.2):**
-   - A. CSV only (today's decision).
-   - B. CSV plus a one-time, read-only copy from the old app's database, offered on a button, never deleting or writing anything in the old app's storage. *(Recommended)*
-   Either way, the old app needs a final update with a takedown notice and an Export button (4.2 list). B is a different proposal from the old-name migration removed on 2026-11-03, which deleted data and ran automatically.
-2. **Seasonal rule:** fixed calendar dates (3.2, this doc) or v1-scope's "last done + interval, snapped to the preferred month". Recommend **calendar dates**: the snap rule skips a year when a yearly task is done after its month. The UI can still ask for a "preferred month"; it's stored as a calendar yearly rule.
-3. **When an estimate is too old to trust (3.3):** estimate a date only when the latest reading is within the last 90 days, or always estimate from whatever readings exist in the last year. Recommend **90 days**: otherwise a mower last read in October can show as due in This week all winter; with it, for at most 90 days.
+1. **Meter reset or replacement (3.3b):**
+   - A. Record a meter change and shift older readings (new `meter`, `odometer` and `oldValue` fields on `readings`, two appended CSV columns). *(Recommended)*
+   - B. Nothing in v1: a lower reading is kept but ignored, and the item stays in the wrong box until the new meter passes the old value.
+   A changes stored data, so it needs the owner's approval before build.
