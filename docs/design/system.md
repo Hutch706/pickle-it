@@ -93,7 +93,7 @@ Text must still work at the largest system text size. Tab labels can cut off wit
 - Jar: a 30 px jar outline (lid plus body) with the jar icon inside at 12 px. Inactive: `--muted`. Active: jar filled `--accent`, icon `--accent-ink`, label bold in `--accent`.
 - Red dot: a 12 px `--err` circle with a 2 px `--surface` ring at the jar's top right. Its non-color equivalent is the link's accessible name, "Vehicles, has items due this week". The dot itself is `aria-hidden`.
 
-**Backup dot.** Same dot as the jar red dot, `--err` (not `--display-fg`, which nearly vanishes in light mode), shown when a backup is due. The dot is `aria-hidden`; the link or button carrying it adds hidden text ", backup due" (e.g. "Settings, backup due").
+**Backup dot.** Sits on the Pantry's Settings gear (top-right of the 44 px button), never on a tab-bar item (pantry.html P11). Same dot as the jar red dot, `--err` (not `--display-fg`, which nearly vanishes in light mode), shown when a backup is due. The dot is `aria-hidden`; the link or button carrying it adds hidden text ", backup due" (e.g. "Settings, backup due"), replacing the plain "Settings" name while the dot shows.
 - Order is fixed: Vehicles, Home, Health, Finance. Hidden jars have no tab, and the other tabs share the width.
 
 **Due box.** A native `<details>` with `<summary>` holding the title, range hint ("Overdue and the next 7 days", "In 1 to 4 weeks", "4 weeks or more"), a count pill (accessible name "6 tasks") and a chevron. Whether each box is open is remembered on the device. When a box is empty, it shows one line; This week shows a canning line instead. Over 50 tasks: a footer saying "Showing 50 of 57" with a chip link to each jar holding the rest.
@@ -141,6 +141,8 @@ A date is estimated only when the latest reading is under 90 days old and two re
 
 **Pending tag (mockups only).** A dashed `--wait` pill with a clock icon, marking something not yet decided or confirmed. Not an app component.
 
+**Meter-change prompt.** When a reading (odometer or hours) is lower than the current one, Save opens an alert dialog instead of an inline error (jars.html J6 to J6e). Title "Was the meter replaced or reset?"; body names what was typed and the last reading. Two full-width buttons, no default: primary "Yes, record a meter change" with the line "Older readings are adjusted so due dates stay right." and secondary "No, I typed it wrong" with "Go back and fix the number." Same wording for vehicles and small engines. Escape or outside tap = No. After Yes: status line "Meter change recorded. Older readings adjusted, due dates unchanged." with the standard 8-second Undo. After No: the Add reading sheet returns with the typed number kept.
+
 ## 5. Icons
 - 24 px grid, 2 px stroke, round caps and joins, no fill, `currentColor`. Drawn at 20-22 px in rows and buttons, 14-18 px in badges and actions, 72 px for empty states.
 - Jar icons: car (Vehicles), house (Home), heart (Health), dollar (Finance). Things: car, house, small engine, person, dollar. Pantry: cabinet (decided).
@@ -169,4 +171,3 @@ Other empty states: "Empty shelves." (no things), "This jar's still empty." (an 
 
 ## 7. Open items in this system
 - app.css still lacks `--err-ink`, `--line-strong` and the new light `--ok`, and still colors the backup dot with `--display-fg`. That's a build step (frontend-engineer).
-- Where the backup dot sits now that Settings is reached from the Pantry gear (not a tab) isn't drawn in the mockups yet.
