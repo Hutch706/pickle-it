@@ -44,7 +44,7 @@ Nothing yet for Home, Health or Finance, for time, hours or date recurrence, a c
 | Backup: CSV export / import | In | All jars; `format_version` on every row **(decided)**; one full export with a plain "not encrypted" warning **(decided)** |
 | Vehicle Maintenance App files | Import only | Its CSV files import as today. No copy, notice period or banner: it has no users with data **(decided)** |
 | Units | Miles and gallons **(decided)** | |
-| Look | In **(decided)** | Follows app.css; Green default; all 7 palettes, each light and dark, plus Light / Dark / System. Phase 2 color fixes: `--err-ink`, per-palette `--line-strong`, backup dot in `--err` with screen-reader text, slightly darker light-mode `--ok` **(decided)** |
+| Look | In **(decided)** | Follows app.css; Green default; all 7 palettes, each light and dark, plus Light / Dark / System. Phase 2 color fixes: `--err-ink`, per-palette `--line-strong`, backup-due dot (on the Settings gear) in `--err` with screen-reader text, slightly darker light-mode `--ok` **(decided)** |
 | Storage | Local-only **(decided)** | Built so cloud storage can be added later; see section 7 |
 | Distribution | Installable web app (PWA) only **(decided)** | On the shared GitHub Pages address for now **(decided)**. Google Play maybe later; no App Store for v1 |
 | Push notifications, accounts, sync, AI receipt reading | Out | See section 6 |
@@ -74,7 +74,8 @@ Acceptance criteria:
 5. The active jar shows a filled jar, white icon and bold label in the palette's main color; while a jar is active the Pantry tab switches to its outlined style.
 6. Every tab has an accessible name that includes the jar name and, when the red dot shows, "has items due" (or equivalent).
 7. There is no Settings tab **(decided)**; Settings opens from the Pantry (4.10).
-8. Five tabs fit and remain usable at 320 px wide and with the largest system text size (labels may truncate; touch targets stay at least 44 x 44 px).
+8. No tab-bar item ever shows a backup-due dot; that dot lives on the Pantry's Settings gear (4.2 AC 15).
+9. Five tabs fit and remain usable at 320 px wide and with the largest system text size (labels may truncate; touch targets stay at least 44 x 44 px).
 
 ### 4.2 Pantry home
 Stories:
@@ -97,7 +98,8 @@ Acceptance criteria:
 11. Tapping a task row opens its quick actions in place (not swipe) **(decided)**: Done, Skip ("Skip this time"), and Add reading for miles and hours tasks (Open for other tasks). Only one row is open at a time. Done and Skip offer Undo for 8 seconds **(decided)**. Done asks for the date (default today) and, for miles or hours tasks, the current reading (default the latest known). Saving recalculates the next due date and moves the task to the right box immediately.
 12. When the user has no things at all, the Pantry shows a first-step prompt to set something up instead of three empty boxes.
 13. The screen scrolls above the tab bar; the last row is never hidden behind it.
-14. The Pantry has a control that opens Settings (4.10). Its accessible name is "Settings".
+14. The Pantry has a gear control that opens Settings (4.10). Its accessible name is "Settings" **(decided)**.
+15. **Backup-due dot (decided):** when a backup is due (the backup reminder in 4.9 AC 6), a red dot shows on the Settings gear, in `--err`. The gear's accessible name becomes "Settings, backup due"; the dot is never the only signal. The dot sits on the gear only, never on a tab-bar item or the Pantry tab. It goes away once an export completes. It does not change the This week count or any box. It stays readable in every palette, light and dark, and at 320 px the gear keeps a 44 x 44 px target.
 
 #### 4.2a Due text
 The same due text is used on the Pantry and wherever a task's next due shows in a jar.
@@ -187,7 +189,7 @@ Acceptance criteria:
 2. Their tasks use interval-from-last-done or fixed-date measures only (no miles or hours).
 3. Tasks support name, measure, notes, last done, mark done, history, edit and delete, as in Home.
 4. Their tasks appear in the Pantry boxes and drive their jar's red dot.
-5. **No medical fields (decided) and no amounts (decided).** No field anywhere in the app, nor any stored field (not just no input), holds: diagnosis, condition, medication, dose, test results, insurance member or policy ID, provider phone or address, date of birth, age, sex, account number, routing number, card number, SSN or tax ID, password, PIN, security answers, balances, or any money amount. A person has no "relationship" field; a first name or "Me" is enough. A library task that depends on age ("colonoscopy at 45") is suggested without asking for a birth date.
+5. **No medical fields (decided) and no amounts (decided).** No field anywhere in the app, nor any stored field (not just no input), holds: diagnosis, condition, medication, dose, test results, insurance member or policy ID, provider phone or address, date of birth, age, sex, account number, routing number, card number, SSN or tax ID, password, PIN, security answers, balances, or any money amount. A person has no "relationship" field; a first name or "Me" is enough. In any jar, also never stored: the user's own name, email or phone, location, photos, and device, analytics or advertising IDs. An import cannot create any of these: unknown columns are ignored (data-model 2.4a). A library task that depends on age ("colonoscopy at 45") is suggested without asking for a birth date.
 6. The notes field shows a per-jar placeholder before the user types:
    - Health: "e.g. Ask about switching to 90-day refills. Skip results and ID numbers."
    - Finance: "e.g. Renewal notice comes by mail. Don't store account numbers or passwords."
@@ -196,7 +198,7 @@ Acceptance criteria:
 8. A user can hide the Health and Finance jars (as any jar, 4.10 AC 7) **(decided)**. A hidden jar's tasks leave the Pantry and the tab bar; its data is kept and comes back when the jar is shown again.
 9. Help copy (release-manager) suggests discreet task names for sensitive things ("Dr. visit" instead of the condition) **(decided: discreet task names)**.
 10. The export warning in 4.9 AC 7 covers Health and Finance.
-11. In v1 **(decided)**: a soft warning, not a block, when a Health or Finance name or note contains a run of 9 or more digits or a likely card number (13-19 digits passing a Luhn check): "This looks like an account or ID number. Pickle It backups aren't encrypted. Save anyway?" Checked on the device only; nothing about the check is stored.
+11. In v1 **(decided)**: a soft warning, not a block, when a Health or Finance name or note contains a run of 9 or more digits or a likely card number (13-19 digits passing a Luhn check): "This looks like an account or ID number. Pickle It backups aren't encrypted. Save anyway?" Checked on the device when saving a thing name, task name, provider or note, before the record is built; choosing Save stores the text exactly as typed, with no flag or masking, and nothing about the check is stored. Import does not run the check (data-model 2.4a).
 
 Later, not v1: a per-jar "hide names" setting that shows "Health task" instead of names on the Pantry (v1.1 **(decided)**); optional Finance amounts after a privacy review **(decided)**. See section 6.
 
@@ -230,12 +232,12 @@ Stories:
 - As a user, I'm told plainly that the file isn't protected before I share or store it.
 
 Acceptance criteria:
-1. Export writes one CSV containing every jar: things, fill-ups, tasks (all measures), shops, hour readings and done history. There is no per-jar export option **(decided)**.
+1. Export writes one CSV containing every jar: things, fill-ups, tasks (all measures), shops, hour readings, meter changes (4.12) and done history. There is no per-jar export option **(decided)**.
 2. Every row has a `format_version` column **(decided)**. Files without it (Vehicle Maintenance App) import as version 1.
 3. Import shows a preview and offers Merge or Replace, as today.
 4. Import accepts a Vehicle Maintenance App CSV and brings over all its vehicle data (4.11).
 5. Export from one device then import on an empty device gives identical data (as today).
-6. The backup reminder nudge still works and counts changes in all jars.
+6. The backup reminder nudge still works and counts changes in all jars. When a backup is due, it shows as the dot on the Pantry's Settings gear (4.2 AC 15) **(decided)**, plus the existing note beside Export.
 7. Next to the Export control, every time (not once), this plain line shows **(decided: plain warning that the backup isn't encrypted)**: "This file isn't encrypted. It includes everything you've saved, including Health and Finance tasks and notes. Keep it somewhere private."
 8. The file name stays `pickle-it-YYYY-MM-DD.csv` and never includes jar names.
 9. No password-protected backup in v1.
@@ -272,8 +274,10 @@ Stories:
     - c. Cancel, Back, closing the dialog, or leaving the screen at either step changes nothing.
     - d. On confirm, only Pickle It's data is removed **(decided)**: the whole `pickle-it` database is deleted in one step, and every `pickle-it:` localStorage key is removed, so theme and palette reset to System and Green **(decided)**. There is no option to delete the Vehicle Maintenance App's data **(decided)**; data belonging to any other app on the same web address is never touched.
     - e. The app then shows the first-run welcome (4.7), with no things and an empty Pantry. The installed app and its offline copy keep working; nothing needs a network connection.
-    - f. Other open Pickle It windows or tabs on the same device show the empty state and don't write old data back.
-    - g. If deleting fails partway, the app says so plainly and doesn't claim success; trying again finishes the job.
+    - d2. Order (data-model 6): the database is deleted first, and only after that succeeds are the `pickle-it:` keys removed. The app's own cached files and service worker stay (they hold no user data), so it reopens offline.
+    - f. Other open Pickle It windows or tabs on the same device reload to the empty state and don't write old data back.
+    - g. If deleting the database fails, the app says so plainly, claims no success, clears nothing else and offers a retry; the data is still there. If another open Pickle It tab holds up the delete, the app shows "Close other Pickle It tabs to finish deleting" and keeps waiting; it finishes by itself when that tab closes and does not report success before then.
+    - g2. After a successful delete the tab reloads and onboarding runs. Help copy says that clearing site data or removing the app from the home screen also deletes everything, and that exported files stay where they were saved.
     - h. Only "Delete all data" deletes everything; no other control (Replace import aside, which already warns) does.
 
 **Assets tab**
@@ -298,6 +302,27 @@ Acceptance criteria:
 4. Pickle It never reads, changes or deletes the old app's stored data; only files the user picks are imported.
 5. Onboarding (4.7 AC 4) and Settings > App settings both offer import.
 6. Pickle It keeps importing Vehicle Maintenance App files indefinitely, after the old app is gone.
+
+### 4.12 Meter replaced or reset (decided 2026-11-03, data-model 3.3b option A)
+An odometer or hour meter can go backward when an instrument cluster, engine or hour meter is replaced, or a mechanical meter rolls over. Without handling, a task stays in the wrong box until the new meter passes the old highest value.
+
+Stories:
+- As a driver whose instrument cluster was replaced, I can enter the new, lower odometer reading and my oil change still comes due at the right time.
+- As a mower owner who swapped the hour meter, I can enter the new hours without losing my history or my schedules.
+- As a user who mistyped a number, I'm asked first, so a typo doesn't become a meter change.
+
+Acceptance criteria:
+1. When a fill-up, service log or reading for a vehicle (odometer) or small engine (hours) is lower than the current value, saving it first asks: "That's lower than the last reading (<value>). Was the meter replaced or reset?", with Yes and No. Nothing is saved until the user answers. The prompt is announced to screen readers and Yes and No are at least 44 x 44 px.
+2. **Yes** saves the entry and records one meter change: its date, the old meter's last value (prefilled with the current value, editable) and the new meter's first value (the number just typed). **No** saves nothing and returns to the form to fix the number.
+3. Typed readings are never edited. Older readings of that meter on that thing are shifted at read time by (new minus old), so history still shows what was typed. Several changes add up. Shifted values can be negative; they are never shown.
+4. After a meter change, the due text, box and estimated date follow the shifted readings. Example: a mower oil task due at 20 hr with 18 hr on the new meter shows "2 hr / Nov 7" and sits in This week, not "20 hr" in Later (data-model 3.3b worked example).
+5. This works for odometers (miles) and hours alike, and for combined miles + time and hours + time tasks. Schedules carry over unchanged for a swapped meter or a new engine.
+6. A "Meter replaced" action on the vehicle or engine records a meter change without a regular entry.
+7. MPG after a change uses the shifted odometer, so the next fill-up gives a normal distance, not a negative one (checked at build, data-model 3.3b).
+8. A lower reading with no meter change recorded is kept, as today, and does not lower the current value (data-model 3.3).
+9. The user can see a thing's meter changes (date, old, new) and delete one. Deleting asks for confirmation, then removes the shift, so due values are recalculated from the readings as typed; no typed reading is lost. Deleting a thing deletes its meter changes with it (counted in 4.10 AC 17).
+10. Export writes each meter change as a `reading` row with the `meter` and `old_value` columns (data-model 3.3b, 4.3), for vehicles as well as engines. Import accepts them and applies the 4.4 checks (finite numbers 0-99,999.9, allowed values, id pattern; a row that fails is listed in the preview and skipped). Merge doesn't duplicate a change already present. Export then import on an empty device gives the same shifted results. Files without these columns import as before.
+11. Delete all data (4.10 AC 12) removes meter changes with everything else, and the import checks in 4.9 and 4.11 apply to them like any other row.
 
 ## 5. Needs a decision
 
@@ -336,7 +361,8 @@ In docs/specs/data-model.md (being revised in parallel):
 6. The miles-per-day and hours-per-day estimates (only when the latest reading is under 90 days old and two readings are 30+ days apart **(decided)**); the "not sure" rule in 4.3 AC 7.
 7. CSV covering all jars with `format_version` on every row, still reading Vehicle Maintenance App files, round-trip identical.
 8. Local-only storage shaped so a later cloud option is a migration, not a rewrite. Storage for jar visibility, onboarding-complete flag and box collapse state.
-9. Delete all data (4.10 AC 12d): delete the whole `pickle-it` database in one step and remove every `pickle-it:` localStorage key **(decided)**, leaving any other app's data on the shared address alone.
+9. Delete all data (4.10 AC 12d): delete the whole `pickle-it` database in one step, then (only after it succeeds) remove every `pickle-it:` localStorage key **(decided)**, leaving any other app's data on the shared address alone. Data-model section 6 has the blocked-delete and other-tab steps.
+9a. Meter changes (4.12): stored as readings, older readings shifted at read time, typed values never edited (data-model 3.3b).
 10. Keep importing Vehicle Maintenance App CSV files (4.11). No one-time copy from the old app **(decided)**.
 
 ## 8. Edge cases to cover in design and test
@@ -344,7 +370,9 @@ In docs/specs/data-model.md (being revised in parallel):
 - Two readings on the same day, readings under 30 days apart, a second reading equal to the first, or a latest reading 90+ days old (no estimate).
 - A very high rate giving an estimated date of today; a very low rate giving a date years away (year shown, 4.2a AC 5).
 - An estimated date that passes before the user enters a new reading ("Due now", 4.2a AC 11).
-- An hour reading entered lower than the last one (meter replaced or typo).
+- An odometer or hour reading entered lower than the last one: answer Yes (meter change) or No (typo), see 4.12.
+- Two meter changes on one thing; a change dated before earlier readings; deleting a meter change; a backup with meter changes imported over existing data.
+- Delete all data blocked by another open tab; the database delete failing, with the `pickle-it:` keys left alone.
 - A "from last done" task last done long ago: overdue by many cycles shows once.
 - A fixed-date task done early, late, or skipped for several cycles.
 - A biweekly fixed-date task across a month end and a daylight-saving change.
